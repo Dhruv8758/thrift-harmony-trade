@@ -37,7 +37,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         <Link to={`/product/${product.id}`}>
           <h3 className="product-card-title">{product.title}</h3>
         </Link>
-        <p className="product-card-price">${product.price.toFixed(2)}</p>
+        <p className="product-card-price">₹{(product.price * 75).toFixed(0)}</p>
         <div className="flex justify-between items-center mt-2">
           <p className="product-card-seller">
             {product.seller.name} • {product.seller.rating}⭐

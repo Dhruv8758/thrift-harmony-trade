@@ -11,7 +11,8 @@ import { dummyProducts } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 
-const MAX_PRICE = 500; // Maximum price for filter
+// Setting maximum price in INR (75 times the previous USD max)
+const MAX_PRICE = 37500; 
 
 const Index = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(dummyProducts);
@@ -37,7 +38,11 @@ const Index = () => {
     // For now, we'll just filter our dummy data
     const filtered = dummyProducts.filter((product) => {
       const matchesCategory = category === null || product.id.includes(category);
-      const matchesPrice = product.price >= price[0] && product.price <= price[1];
+      
+      // Convert product price to INR for filtering
+      const productPriceINR = product.price * 75;
+      const matchesPrice = productPriceINR >= price[0] && productPriceINR <= price[1];
+      
       return matchesCategory && matchesPrice;
     });
 

@@ -55,6 +55,9 @@ const ProductDetail = () => {
     });
   };
 
+  // Convert product price to INR
+  const priceInINR = product.price * 75;
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -86,7 +89,7 @@ const ProductDetail = () => {
                 <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
                 <div className="flex items-center mt-2">
                   <p className="text-2xl font-bold text-scrapeGenie-600">
-                    ${product.price.toFixed(2)}
+                    ₹{priceInINR.toFixed(0)}
                   </p>
                   <span className="ml-4 px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
                     {product.condition}
@@ -186,7 +189,7 @@ const ProductDetail = () => {
                     </div>
                     <div className="product-card-content">
                       <h3 className="product-card-title">{product.title}</h3>
-                      <p className="product-card-price">${product.price.toFixed(2)}</p>
+                      <p className="product-card-price">₹{(product.price * 75).toFixed(0)}</p>
                     </div>
                   </div>
                 </Link>
