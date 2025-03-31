@@ -15,7 +15,7 @@ const Hero = () => {
             Discover unique second-hand items, connect with sellers, and give pre-loved goods a new life. Shop sustainably, save money, and reduce waste.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/" className="w-full sm:w-auto">
+            <Link to="/#browse-items" className="w-full sm:w-auto">
               <Button className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700 text-white py-6 px-8 text-lg w-full sm:w-auto">
                 Start Shopping
               </Button>
@@ -38,4 +38,3 @@ const Hero = () => {
 };
 
 export default Hero;
-

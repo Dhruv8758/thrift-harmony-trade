@@ -96,9 +96,11 @@ const Navbar = () => {
                 <User className="h-5 w-5" />
               </Button>
             </Link>
-            <Button className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700">
-              Sign In
-            </Button>
+            <Link to="/sign-in">
+              <Button className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700">
+                Sign In
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -156,12 +158,13 @@ const Navbar = () => {
               >
                 Profile
               </Link>
-              <Button 
-                className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700 w-full"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Sign In
-              </Button>
+              <Link to="/sign-in" onClick={() => setIsMenuOpen(false)}>
+                <Button 
+                  className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700 w-full"
+                >
+                  Sign In
+                </Button>
+              </Link>
             </div>
           </div>
         )}
