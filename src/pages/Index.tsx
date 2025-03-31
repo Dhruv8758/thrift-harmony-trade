@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import FeaturedProducts from "@/components/FeaturedProducts";
@@ -15,24 +16,40 @@ import { SlidersHorizontal } from "lucide-react";
 const MAX_PRICE = 37500; 
 
 const Index = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get('search');
+  const categoryParam = searchParams.get('category');
+
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(dummyProducts);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, MAX_PRICE]);
   const [showFilters, setShowFilters] = useState(false);
 
+  useEffect(() => {
+    // Apply filters when URL search params change
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+    
+    // Apply search filter if present
+    filterProducts(categoryParam, priceRange, searchQuery);
+  }, [location.search, categoryParam]);
+
   const handleCategorySelect = (categoryId: string | null) => {
     setSelectedCategory(categoryId);
-    filterProducts(categoryId, priceRange);
+    filterProducts(categoryId, priceRange, searchQuery);
   };
 
   const handlePriceRangeChange = (min: number, max: number) => {
     setPriceRange([min, max]);
-    filterProducts(selectedCategory, [min, max]);
+    filterProducts(selectedCategory, [min, max], searchQuery);
   };
 
   const filterProducts = (
     category: string | null,
-    price: [number, number]
+    price: [number, number],
+    search: string | null = null
   ) => {
     // In a real app, you'd call an API with these filters
     // For now, we'll just filter our dummy data
@@ -43,7 +60,10 @@ const Index = () => {
       const productPriceINR = product.price * 75;
       const matchesPrice = productPriceINR >= price[0] && productPriceINR <= price[1];
       
-      return matchesCategory && matchesPrice;
+      const matchesSearch = search === null || 
+        product.title.toLowerCase().includes(search.toLowerCase());
+      
+      return matchesCategory && matchesPrice && matchesSearch;
     });
 
     setFilteredProducts(filtered);
@@ -54,14 +74,18 @@ const Index = () => {
       <Navbar />
       
       <main className="flex-grow">
-        <Hero />
+        {!searchQuery && <Hero />}
         
         <div className="container mx-auto px-4 py-8">
-          <FeaturedProducts />
+          {!searchQuery && <FeaturedProducts />}
           
-          <section className="my-10">
+          <section className="my-10" id="browse-items">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Browse All Items</h2>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {searchQuery 
+                  ? `Search Results for "${searchQuery}"` 
+                  : "Browse All Items"}
+              </h2>
               <Button 
                 variant="outline" 
                 className="md:hidden flex items-center gap-2"
