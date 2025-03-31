@@ -15,12 +15,12 @@ const Hero = () => {
             Discover unique second-hand items, connect with sellers, and give pre-loved goods a new life. Shop sustainably, save money, and reduce waste.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/#browse-items">
+            <Link to="/" className="w-full sm:w-auto">
               <Button className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700 text-white py-6 px-8 text-lg w-full sm:w-auto">
                 Start Shopping
               </Button>
             </Link>
-            <Link to="/sell">
+            <Link to="/sell" className="w-full sm:w-auto">
               <Button variant="outline" className="py-6 px-8 text-lg group w-full sm:w-auto">
                 Sell an Item
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -38,3 +38,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
