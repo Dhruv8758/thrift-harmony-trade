@@ -1,0 +1,181 @@
+
+import { Product } from "@/components/ProductCard";
+
+export const dummyProducts: Product[] = [
+  {
+    id: "1",
+    title: "Vintage Denim Jacket",
+    price: 45.99,
+    image: "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "VintageLover",
+      rating: 4.8
+    }
+  },
+  {
+    id: "2",
+    title: "Mechanical Keyboard (Cherry MX)",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "TechDeals",
+      rating: 4.9
+    }
+  },
+  {
+    id: "3",
+    title: "Mid-Century Coffee Table",
+    price: 120.00,
+    image: "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "HomeDecorPro",
+      rating: 4.7
+    }
+  },
+  {
+    id: "4",
+    title: "Paperback Book Collection (Set of 5)",
+    price: 25.50,
+    image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "BookWorm42",
+      rating: 4.6
+    }
+  },
+  {
+    id: "5",
+    title: "Mountain Bike - Trek",
+    price: 350.00,
+    image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "BikeEnthusiast",
+      rating: 4.8
+    }
+  },
+  {
+    id: "6",
+    title: "Nintendo Switch with 2 Games",
+    price: 240.00,
+    image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "GamersParadise",
+      rating: 4.9
+    }
+  },
+  {
+    id: "7",
+    title: "Vintage Film Camera",
+    price: 75.99,
+    image: "https://images.unsplash.com/photo-1526948128573-703ee1aeb6fa?w=800&auto=format&fit=crop",
+    condition: "Fair",
+    seller: {
+      name: "RetroCollector",
+      rating: 4.7
+    }
+  },
+  {
+    id: "8",
+    title: "Leather Messenger Bag",
+    price: 65.00,
+    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "UrbanStyle",
+      rating: 4.5
+    }
+  },
+  {
+    id: "9",
+    title: "Vintage Record Player",
+    price: 130.00,
+    image: "https://images.unsplash.com/photo-1511735111819-9a3f7709049c?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "MusicVintage",
+      rating: 4.6
+    }
+  },
+  {
+    id: "10",
+    title: "DSLR Camera - Canon",
+    price: 420.50,
+    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "PhotoPro",
+      rating: 4.9
+    }
+  },
+  {
+    id: "11",
+    title: "Antique Wooden Chair",
+    price: 85.99,
+    image: "https://images.unsplash.com/photo-1503602642458-232111445657?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "VintageHome",
+      rating: 4.7
+    }
+  },
+  {
+    id: "12",
+    title: "Designer Handbag - Barely Used",
+    price: 195.00,
+    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "FashionFinds",
+      rating: 4.8
+    }
+  },
+  {
+    id: "13",
+    title: "Wireless Headphones",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "AudioPhile",
+      rating: 4.6
+    }
+  },
+  {
+    id: "14",
+    title: "Vintage Polaroid Camera",
+    price: 60.00,
+    image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&auto=format&fit=crop",
+    condition: "Fair",
+    seller: {
+      name: "RetroTech",
+      rating: 4.4
+    }
+  },
+  {
+    id: "15",
+    title: "Handmade Ceramic Vase",
+    price: 38.50,
+    image: "https://images.unsplash.com/photo-1612900538103-ff51d8c24cfc?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "ArtisanCrafts",
+      rating: 4.9
+    }
+  },
+  {
+    id: "16",
+    title: "Acoustic Guitar",
+    price: 150.00,
+    image: "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "MusicLover",
+      rating: 4.7
+    }
+  }
+];
