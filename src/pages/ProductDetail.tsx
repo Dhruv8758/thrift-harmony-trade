@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { dummyProducts } from "@/data/products";
@@ -8,21 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Heart, 
-  Share, 
-  ShoppingCart, 
-  CreditCard, 
   User, 
-  Star, 
-  Truck, 
-  Calendar, 
-  Shield, 
   Phone, 
   Mail, 
   MessageCircle 
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Card, CardContent } from "@/components/ui/card";
 import { 
   HoverCard,
   HoverCardContent,
@@ -38,52 +30,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
-// Mock review data
-interface Review {
-  id: string;
-  userName: string;
-  rating: number;
-  date: string;
-  title: string;
-  comment: string;
-  verified: boolean;
-}
-
-const mockReviews: Review[] = [
-  {
-    id: "r1",
-    userName: "SatisfiedCustomer123",
-    rating: 5,
-    date: "2023-04-15",
-    title: "Excellent purchase, highly recommend!",
-    comment: "This product exceeded my expectations. The quality is fantastic and it arrived in perfect condition. I would definitely buy again.",
-    verified: true
-  },
-  {
-    id: "r2",
-    userName: "RegularShopper",
-    rating: 4,
-    date: "2023-03-22",
-    title: "Very good value for money",
-    comment: "Great product for the price. Only giving 4 stars because shipping took a bit longer than expected.",
-    verified: true
-  },
-  {
-    id: "r3",
-    userName: "HonestReviewer",
-    rating: 3,
-    date: "2023-02-10",
-    title: "Decent but has some flaws",
-    comment: "The product is okay but I noticed some minor issues. The seller was helpful though and offered a partial refund.",
-    verified: false
-  }
-];
-
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
   const [message, setMessage] = useState("");
   const { toast } = useToast();
 
@@ -96,8 +46,6 @@ const ProductDetail = () => {
       .sort(() => 0.5 - Math.random())
       .slice(0, 4);
     setRelatedProducts(related);
-
-    setReviews(mockReviews);
   }, [id]);
 
   if (!product) {
@@ -117,22 +65,6 @@ const ProductDetail = () => {
     );
   }
 
-  const handleAddToCart = () => {
-    toast({
-      title: "Added to cart!",
-      description: `${product.title} has been added to your cart.`,
-    });
-  };
-
-  const handleBuyNow = () => {
-    toast({
-      title: "Proceeding to checkout!",
-      description: `You are buying ${product.title}.`,
-    });
-    // In a real app, this would redirect to checkout
-    // For now we just show a toast
-  };
-
   const handleContactSeller = () => {
     toast({
       title: "Message sent!",
@@ -142,8 +74,6 @@ const ProductDetail = () => {
   };
 
   const priceInINR = product.price * 75;
-
-  const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -172,17 +102,6 @@ const ProductDetail = () => {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
                 <div className="flex items-center mt-2">
-                  <div className="flex items-center mr-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className={`h-4 w-4 ${i < Math.round(averageRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                      />
-                    ))}
-                    <span className="ml-2 text-sm text-gray-600">
-                      {averageRating.toFixed(1)} ({reviews.length} reviews)
-                    </span>
-                  </div>
                   <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
                     {product.condition}
                   </span>
@@ -191,31 +110,32 @@ const ProductDetail = () => {
               
               <Separator />
               
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 className="font-semibold text-lg mb-2 flex items-center">
+              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                <h3 className="font-semibold text-xl mb-4 flex items-center">
                   <User className="h-5 w-5 mr-2 text-scrapeGenie-600" />
                   Seller Information
                 </h3>
                 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
-                      <span className="font-medium">{product.seller.name}</span>
+                      <span className="font-medium text-lg">{product.seller.name}</span>
                       <span className="ml-2 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
                         Verified Seller
                       </span>
                     </div>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                      <span className="ml-1 text-sm">{product.seller.rating}</span>
-                    </div>
+                  </div>
+                  
+                  <div className="text-sm text-gray-600 mb-4">
+                    <p>Location: Mumbai, Maharashtra</p>
+                    <p>Selling since: January 2023</p>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-2">
                     <HoverCard>
                       <HoverCardTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Phone className="h-4 w-4 mr-1" /> Call
+                        <Button variant="outline" size="lg" className="w-full">
+                          <Phone className="h-4 w-4 mr-2" /> Call
                         </Button>
                       </HoverCardTrigger>
                       <HoverCardContent className="w-fit p-2">
@@ -225,8 +145,8 @@ const ProductDetail = () => {
                     
                     <HoverCard>
                       <HoverCardTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Mail className="h-4 w-4 mr-1" /> Email
+                        <Button variant="outline" size="lg" className="w-full">
+                          <Mail className="h-4 w-4 mr-2" /> Email
                         </Button>
                       </HoverCardTrigger>
                       <HoverCardContent className="w-fit p-2">
@@ -236,8 +156,8 @@ const ProductDetail = () => {
                     
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full">
-                          <MessageCircle className="h-4 w-4 mr-1" /> Message
+                        <Button variant="outline" size="lg" className="w-full">
+                          <MessageCircle className="h-4 w-4 mr-2" /> Message
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-md">
@@ -271,72 +191,14 @@ const ProductDetail = () => {
                       </DialogContent>
                     </Dialog>
                   </div>
-                  
-                  <div className="text-sm text-gray-600">
-                    <p>Location: Mumbai, Maharashtra</p>
-                    <p>Selling since: January 2023</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Star className="h-5 w-5 text-yellow-400" />
-                  <p className="text-gray-700">
-                    Seller Rating: <span className="font-medium">{product.seller.rating}</span>
-                  </p>
                 </div>
               </div>
               
               <div className="p-4 bg-gray-50 rounded-lg">
                 <div className="flex flex-col space-y-3">
-                  <p className="text-2xl font-bold text-scrapeGenie-600">
+                  <p className="text-2xl font-bold text-gray-700">
                     ₹{priceInINR.toFixed(0)}
                   </p>
-                  <p className="text-sm text-green-600">
-                    Free shipping available
-                  </p>
-                  <div className="flex items-center text-sm text-gray-700">
-                    <Truck className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>Estimated delivery: 3-5 business days</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-700">
-                    <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>30-day return policy</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-700">
-                    <Shield className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>Buyer protection included</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <Button 
-                  onClick={handleAddToCart}
-                  className="w-full bg-scrapeGenie-600 hover:bg-scrapeGenie-700 py-6 text-lg"
-                >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
-                </Button>
-                
-                <Button 
-                  onClick={handleBuyNow}
-                  className="w-full bg-green-600 hover:bg-green-700 py-6 text-lg text-white"
-                >
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Buy Now
-                </Button>
-                
-                <div className="flex space-x-4">
-                  <Button variant="outline" className="flex-1">
-                    <Heart className="mr-2 h-5 w-5" />
-                    Save
-                  </Button>
-                  <Button variant="outline" className="flex-1">
-                    <Share className="mr-2 h-5 w-5" />
-                    Share
-                  </Button>
                 </div>
               </div>
             </div>
@@ -347,8 +209,6 @@ const ProductDetail = () => {
               <TabsList className="w-full">
                 <TabsTrigger value="description" className="flex-1">Description</TabsTrigger>
                 <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
-                <TabsTrigger value="shipping" className="flex-1">Shipping</TabsTrigger>
-                <TabsTrigger value="reviews" className="flex-1">Reviews</TabsTrigger>
               </TabsList>
               
               <TabsContent value="description" className="pt-4">
@@ -367,77 +227,11 @@ const ProductDetail = () => {
                   <li>All original parts included</li>
                 </ul>
               </TabsContent>
-              
-              <TabsContent value="shipping" className="pt-4">
-                <p className="text-gray-700">
-                  Shipping is handled by the seller. Standard shipping takes 3-5 business days.
-                  Express shipping is available for an additional fee. Local pickup may be
-                  available depending on your location.
-                </p>
-              </TabsContent>
-              
-              <TabsContent value="reviews" className="pt-4">
-                <div className="space-y-6">
-                  <div className="flex items-center">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`h-5 w-5 ${i < Math.round(averageRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                        />
-                      ))}
-                    </div>
-                    <p className="ml-2 text-lg font-medium">
-                      {averageRating.toFixed(1)} out of 5
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {reviews.map(review => (
-                      <Card key={review.id} className="overflow-hidden">
-                        <CardContent className="p-6">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <div className="flex items-center mb-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star 
-                                    key={i} 
-                                    className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                                  />
-                                ))}
-                              </div>
-                              <h4 className="font-bold">{review.title}</h4>
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {new Date(review.date).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })}
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center mt-2 text-sm text-gray-600">
-                            <span>By {review.userName}</span>
-                            {review.verified && (
-                              <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs">
-                                Verified Purchase
-                              </span>
-                            )}
-                          </div>
-                          
-                          <p className="mt-3 text-gray-700">{review.comment}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              </TabsContent>
             </Tabs>
           </div>
           
           <section className="mt-16">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">You may also like</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Similar Items</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {relatedProducts.map((product) => (
                 <Link to={`/product/${product.id}`} key={product.id}>
