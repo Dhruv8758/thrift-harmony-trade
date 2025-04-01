@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { dummyProducts } from "@/data/products";
@@ -8,9 +7,36 @@ import { Product } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Share, ShoppingCart, CreditCard, User, Star, Truck, Calendar, Shield } from "lucide-react";
+import { 
+  Heart, 
+  Share, 
+  ShoppingCart, 
+  CreditCard, 
+  User, 
+  Star, 
+  Truck, 
+  Calendar, 
+  Shield, 
+  Phone, 
+  Mail, 
+  MessageCircle 
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
+import { 
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 // Mock review data
 interface Review {
@@ -58,22 +84,19 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [message, setMessage] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
-    // In a real app, you'd fetch this data from an API
-    // For now, we'll use our dummy data
     const foundProduct = dummyProducts.find((p) => p.id === id);
     setProduct(foundProduct || null);
 
-    // Get random related products
     const related = dummyProducts
       .filter((p) => p.id !== id)
       .sort(() => 0.5 - Math.random())
       .slice(0, 4);
     setRelatedProducts(related);
 
-    // Set mock reviews
     setReviews(mockReviews);
   }, [id]);
 
@@ -110,10 +133,16 @@ const ProductDetail = () => {
     // For now we just show a toast
   };
 
-  // Convert product price to INR
+  const handleContactSeller = () => {
+    toast({
+      title: "Message sent!",
+      description: `Your message has been sent to ${product?.seller.name}.`,
+    });
+    setMessage("");
+  };
+
   const priceInINR = product.price * 75;
 
-  // Calculate average rating
   const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
 
   return (
@@ -122,7 +151,6 @@ const ProductDetail = () => {
       
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
-          {/* Breadcrumb */}
           <div className="mb-6 text-sm text-gray-500">
             <Link to="/" className="hover:text-scrapeGenie-600">Home</Link> {" / "}
             <Link to="/categories" className="hover:text-scrapeGenie-600">Categories</Link> {" / "}
@@ -130,7 +158,6 @@ const ProductDetail = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Product Images */}
             <div className="space-y-4">
               <div className="bg-white rounded-lg overflow-hidden shadow-md">
                 <img 
@@ -141,7 +168,6 @@ const ProductDetail = () => {
               </div>
             </div>
             
-            {/* Product Info */}
             <div className="space-y-6">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
@@ -165,14 +191,95 @@ const ProductDetail = () => {
               
               <Separator />
               
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <User className="h-5 w-5 text-gray-500" />
-                  <p className="text-gray-700">
-                    Seller: <span className="font-medium">{product.seller.name}</span>
-                  </p>
-                </div>
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 className="font-semibold text-lg mb-2 flex items-center">
+                  <User className="h-5 w-5 mr-2 text-scrapeGenie-600" />
+                  Seller Information
+                </h3>
                 
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <span className="font-medium">{product.seller.name}</span>
+                      <span className="ml-2 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
+                        Verified Seller
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                      <span className="ml-1 text-sm">{product.seller.rating}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-2">
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Phone className="h-4 w-4 mr-1" /> Call
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-fit p-2">
+                        <p className="text-sm font-medium">+91 98765 43210</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                    
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Mail className="h-4 w-4 mr-1" /> Email
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-fit p-2">
+                        <p className="text-sm font-medium">{product.seller.name.toLowerCase().replace(/\s/g, '')}@example.com</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <MessageCircle className="h-4 w-4 mr-1" /> Message
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Message to {product.seller.name}</DialogTitle>
+                          <DialogDescription>
+                            Send a message directly to the seller about this item.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <div className="flex items-center space-x-2">
+                            <div className="font-medium">About:</div>
+                            <div className="text-sm text-muted-foreground">{product.title}</div>
+                          </div>
+                          <div className="grid gap-2">
+                            <div className="font-medium">Your message:</div>
+                            <Input
+                              placeholder="I'm interested in this item..."
+                              value={message}
+                              onChange={(e) => setMessage(e.target.value)}
+                              className="w-full"
+                            />
+                          </div>
+                          <Button 
+                            className="w-full" 
+                            onClick={handleContactSeller}
+                          >
+                            Send Message
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  
+                  <div className="text-sm text-gray-600">
+                    <p>Location: Mumbai, Maharashtra</p>
+                    <p>Selling since: January 2023</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Star className="h-5 w-5 text-yellow-400" />
                   <p className="text-gray-700">
@@ -205,7 +312,6 @@ const ProductDetail = () => {
               </div>
               
               <div className="space-y-4">
-                {/* Add to Cart button */}
                 <Button 
                   onClick={handleAddToCart}
                   className="w-full bg-scrapeGenie-600 hover:bg-scrapeGenie-700 py-6 text-lg"
@@ -214,7 +320,6 @@ const ProductDetail = () => {
                   Add to Cart
                 </Button>
                 
-                {/* Buy Now button */}
                 <Button 
                   onClick={handleBuyNow}
                   className="w-full bg-green-600 hover:bg-green-700 py-6 text-lg text-white"
@@ -237,7 +342,6 @@ const ProductDetail = () => {
             </div>
           </div>
           
-          {/* Product Details Tabs */}
           <div className="mt-12">
             <Tabs defaultValue="description">
               <TabsList className="w-full">
@@ -332,7 +436,6 @@ const ProductDetail = () => {
             </Tabs>
           </div>
           
-          {/* Related Products */}
           <section className="mt-16">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">You may also like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
