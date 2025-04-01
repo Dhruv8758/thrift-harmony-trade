@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 const Hero = () => {
+  const scrollToItems = () => {
+    const browseSection = document.getElementById('browse-items');
+    if (browseSection) {
+      browseSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="relative bg-gradient-to-r from-scrapeGenie-50 to-scrapeGenie-100 py-16 md:py-24">
       <div className="container mx-auto px-4">
@@ -15,11 +22,12 @@ const Hero = () => {
             Discover unique second-hand items, connect with sellers, and give pre-loved goods a new life. Shop sustainably, save money, and reduce waste.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/#browse-items" className="w-full sm:w-auto">
-              <Button className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700 text-white py-6 px-8 text-lg w-full sm:w-auto">
-                Start Shopping
-              </Button>
-            </Link>
+            <Button 
+              onClick={scrollToItems}
+              className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700 text-white py-6 px-8 text-lg w-full sm:w-auto"
+            >
+              Start Shopping
+            </Button>
             <Link to="/sell" className="w-full sm:w-auto">
               <Button variant="outline" className="py-6 px-8 text-lg group w-full sm:w-auto">
                 Sell an Item
