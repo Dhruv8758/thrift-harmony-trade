@@ -8,7 +8,7 @@ import { Product } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Share, ShoppingCart, Star, User } from "lucide-react";
+import { Heart, Share, ShoppingCart, CreditCard, User, Star } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const ProductDetail = () => {
@@ -53,6 +53,15 @@ const ProductDetail = () => {
       title: "Added to cart!",
       description: `${product.title} has been added to your cart.`,
     });
+  };
+
+  const handleBuyNow = () => {
+    toast({
+      title: "Proceeding to checkout!",
+      description: `You are buying ${product.title}.`,
+    });
+    // In a real app, this would redirect to checkout
+    // For now we just show a toast
   };
 
   // Convert product price to INR
@@ -116,12 +125,22 @@ const ProductDetail = () => {
               </div>
               
               <div className="space-y-4">
+                {/* Add to Cart button */}
                 <Button 
                   onClick={handleAddToCart}
                   className="w-full bg-scrapeGenie-600 hover:bg-scrapeGenie-700 py-6 text-lg"
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
                   Add to Cart
+                </Button>
+                
+                {/* Buy Now button */}
+                <Button 
+                  onClick={handleBuyNow}
+                  className="w-full bg-green-600 hover:bg-green-700 py-6 text-lg text-white"
+                >
+                  <CreditCard className="mr-2 h-5 w-5" />
+                  Buy Now
                 </Button>
                 
                 <div className="flex space-x-4">
