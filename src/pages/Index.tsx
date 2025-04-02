@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -51,10 +50,9 @@ const Index = () => {
     price: [number, number],
     search: string | null = null
   ) => {
-    // In a real app, you'd call an API with these filters
-    // For now, we'll just filter our dummy data
+    // Filter products based on category, price, and search
     const filtered = dummyProducts.filter((product) => {
-      const matchesCategory = category === null || product.id.includes(category);
+      const matchesCategory = category === null || product.category === category;
       
       // Convert product price to INR for filtering
       const productPriceINR = product.price * 75;

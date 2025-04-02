@@ -11,7 +11,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "VintageLover",
       rating: 4.8
-    }
+    },
+    category: "clothing"
   },
   {
     id: "2",
@@ -22,7 +23,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "TechDeals",
       rating: 4.9
-    }
+    },
+    category: "electronics"
   },
   {
     id: "3",
@@ -33,7 +35,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "HomeDecorPro",
       rating: 4.7
-    }
+    },
+    category: "home"
   },
   {
     id: "4",
@@ -44,7 +47,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "BookWorm42",
       rating: 4.6
-    }
+    },
+    category: "books"
   },
   {
     id: "5",
@@ -55,7 +59,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "BikeEnthusiast",
       rating: 4.8
-    }
+    },
+    category: "vehicles"
   },
   {
     id: "6",
@@ -66,7 +71,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "GamersParadise",
       rating: 4.9
-    }
+    },
+    category: "electronics"
   },
   {
     id: "7",
@@ -77,7 +83,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "RetroCollector",
       rating: 4.7
-    }
+    },
+    category: "electronics"
   },
   {
     id: "8",
@@ -88,7 +95,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "UrbanStyle",
       rating: 4.5
-    }
+    },
+    category: "clothing"
   },
   {
     id: "9",
@@ -99,7 +107,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "MusicVintage",
       rating: 4.6
-    }
+    },
+    category: "music"
   },
   {
     id: "10",
@@ -110,7 +119,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "PhotoPro",
       rating: 4.9
-    }
+    },
+    category: "electronics"
   },
   {
     id: "11",
@@ -121,7 +131,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "VintageHome",
       rating: 4.7
-    }
+    },
+    category: "home"
   },
   {
     id: "12",
@@ -132,7 +143,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "FashionFinds",
       rating: 4.8
-    }
+    },
+    category: "clothing"
   },
   {
     id: "13",
@@ -143,7 +155,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "AudioPhile",
       rating: 4.6
-    }
+    },
+    category: "electronics"
   },
   {
     id: "14",
@@ -154,7 +167,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "RetroTech",
       rating: 4.4
-    }
+    },
+    category: "electronics"
   },
   {
     id: "15",
@@ -165,7 +179,8 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "ArtisanCrafts",
       rating: 4.9
-    }
+    },
+    category: "home"
   },
   {
     id: "16",
@@ -176,6 +191,79 @@ export const dummyProducts: Product[] = [
     seller: {
       name: "MusicLover",
       rating: 4.7
-    }
+    },
+    category: "music"
+  },
+  {
+    id: "17",
+    title: "Game of Thrones Book Set",
+    price: 65.00,
+    image: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "BookLover",
+      rating: 4.8
+    },
+    category: "books"
+  },
+  {
+    id: "18",
+    title: "Harry Potter Complete Collection",
+    price: 120.00,
+    image: "https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "MagicBooks",
+      rating: 4.9
+    },
+    category: "books"
+  },
+  {
+    id: "19",
+    title: "Programming Language Textbooks",
+    price: 45.00,
+    image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "CodeMaster",
+      rating: 4.7
+    },
+    category: "books"
+  },
+  {
+    id: "20",
+    title: "Classic Literature Collection",
+    price: 55.00,
+    image: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "LiteraryGems",
+      rating: 4.8
+    },
+    category: "books"
+  },
+  {
+    id: "21",
+    title: "Power Drill Set - Professional",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1572981739426-e70c834d29d3?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "ToolMaster",
+      rating: 4.9
+    },
+    category: "tools"
+  },
+  {
+    id: "22",
+    title: "Smart Watch - Health Tracker",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "TechGadgets",
+      rating: 4.7
+    },
+    category: "watches"
   }
 ];

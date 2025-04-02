@@ -9,24 +9,25 @@ export type Category = {
   name: string;
 };
 
-// Expanded category list with more items
+// Updated to match the categories in Categories.tsx
 const categories: Category[] = [
-  { id: "1", name: "Clothing" },
-  { id: "2", name: "Electronics" },
-  { id: "3", name: "Home & Kitchen" },
-  { id: "4", name: "Books" },
-  { id: "5", name: "Sports & Outdoors" },
-  { id: "6", name: "Toys & Games" },
-  { id: "7", name: "Beauty & Personal Care" },
-  { id: "8", name: "Jewelry" },
-  { id: "9", name: "Automotive" },
-  { id: "10", name: "Health & Wellness" },
-  { id: "11", name: "Pet Supplies" },
-  { id: "12", name: "Tools & Home Improvement" },
-  { id: "13", name: "Office Supplies" },
-  { id: "14", name: "Musical Instruments" },
-  { id: "15", name: "Groceries" },
-  { id: "16", name: "Baby Products" },
+  { id: "electronics", name: "Electronics" },
+  { id: "clothing", name: "Clothing & Accessories" },
+  { id: "home", name: "Home & Garden" },
+  { id: "books", name: "Books & Media" },
+  { id: "vehicles", name: "Vehicles" },
+  { id: "kitchen", name: "Kitchen & Dining" },
+  { id: "watches", name: "Watches & Accessories" },
+  { id: "toys", name: "Toys & Hobbies" },
+  { id: "business", name: "Business & Industrial" },
+  { id: "music", name: "Musical Instruments" },
+  { id: "baby", name: "Baby & Kids" },
+  { id: "sports", name: "Sports & Outdoors" },
+  { id: "tools", name: "Tools & Hardware" },
+  { id: "health", name: "Health & Beauty" },
+  { id: "food", name: "Food & Beverages" },
+  { id: "computers", name: "Computers & Tablets" },
+  { id: "art", name: "Art & Craft Supplies" },
 ];
 
 interface CategoryFilterProps {

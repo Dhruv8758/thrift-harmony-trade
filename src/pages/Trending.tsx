@@ -5,8 +5,10 @@ import ProductCard from "@/components/ProductCard";
 import { dummyProducts } from "@/data/products";
 
 const Trending = () => {
-  // Use a subset of products as trending products
-  const trendingProducts = dummyProducts.slice(4, 16);
+  // Use a subset of products as trending products - different categories
+  const trendingProducts = dummyProducts.filter((product, index) => 
+    index % 3 === 0 || index % 5 === 0
+  ).slice(0, 12);
 
   return (
     <div className="flex flex-col min-h-screen">

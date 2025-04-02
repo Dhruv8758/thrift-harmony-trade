@@ -13,6 +13,7 @@ export type Product = {
     name: string;
     rating: number;
   };
+  category: string;
 };
 
 const ProductCard = ({ product }: { product: Product }) => {
