@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -10,6 +11,7 @@ import Footer from "@/components/Footer";
 import { dummyProducts } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 // Setting maximum price in INR (75 times the previous USD max)
 const MAX_PRICE = 37500; 
@@ -19,6 +21,7 @@ const Index = () => {
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get('search');
   const categoryParam = searchParams.get('category');
+  const { toast } = useToast();
 
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(dummyProducts);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
@@ -65,6 +68,15 @@ const Index = () => {
     });
 
     setFilteredProducts(filtered);
+    
+    // Show notification if no products are found
+    if (filtered.length === 0) {
+      toast({
+        title: "No products found",
+        description: "Try adjusting your filters or search query.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -72,17 +84,19 @@ const Index = () => {
       <Navbar />
       
       <main className="flex-grow">
-        {!searchQuery && <Hero />}
+        {!searchQuery && !categoryParam && <Hero />}
         
         <div className="container mx-auto px-4 py-8">
-          {!searchQuery && <FeaturedProducts />}
+          {!searchQuery && !categoryParam && <FeaturedProducts />}
           
           <section className="my-10" id="browse-items">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
                 {searchQuery 
                   ? `Search Results for "${searchQuery}"` 
-                  : "Browse All Items"}
+                  : categoryParam
+                    ? `${categoryParam.charAt(0).toUpperCase() + categoryParam.slice(1)} Products`
+                    : "Browse All Items"}
               </h2>
               <Button 
                 variant="outline" 

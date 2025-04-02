@@ -41,11 +41,12 @@ const CategoryFilter = ({ onCategorySelect, selectedCategory }: CategoryFilterPr
 
   const handleCategoryClick = (categoryId: string | null) => {
     onCategorySelect(categoryId);
+    
     // Update the URL when a category is selected
     if (categoryId) {
-      navigate(`/?category=${categoryId}`);
+      navigate(`/?category=${categoryId}`, { replace: true });
     } else {
-      navigate('/');
+      navigate('/', { replace: true });
     }
   };
 
