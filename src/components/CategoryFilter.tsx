@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export type Category = {
   id: string;
@@ -26,6 +27,17 @@ interface CategoryFilterProps {
 
 const CategoryFilter = ({ onCategorySelect, selectedCategory }: CategoryFilterProps) => {
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryId: string | null) => {
+    onCategorySelect(categoryId);
+    // Optional: Also update the URL
+    if (categoryId) {
+      navigate(`/?category=${categoryId}`);
+    } else {
+      navigate('/');
+    }
+  };
 
   return (
     <div className="mb-6">
@@ -53,7 +65,7 @@ const CategoryFilter = ({ onCategorySelect, selectedCategory }: CategoryFilterPr
             <Button
               variant={selectedCategory === null ? "default" : "outline"}
               className={selectedCategory === null ? "bg-scrapeGenie-600 hover:bg-scrapeGenie-700" : ""}
-              onClick={() => onCategorySelect(null)}
+              onClick={() => handleCategoryClick(null)}
               size="sm"
             >
               All Items
@@ -64,7 +76,7 @@ const CategoryFilter = ({ onCategorySelect, selectedCategory }: CategoryFilterPr
                 key={category.id}
                 variant={selectedCategory === category.id ? "default" : "outline"}
                 className={selectedCategory === category.id ? "bg-scrapeGenie-600 hover:bg-scrapeGenie-700" : ""}
-                onClick={() => onCategorySelect(category.id)}
+                onClick={() => handleCategoryClick(category.id)}
                 size="sm"
               >
                 {category.name}
