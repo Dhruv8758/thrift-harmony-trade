@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,7 +15,7 @@ import {
   Baby, 
   Truck,
   ChevronRight,
-  Tool,
+  Wrench,
   Heart,
   Coffee,
   Laptop,
@@ -36,7 +35,7 @@ const categories = [
   { id: "music", name: "Musical Instruments", icon: Music, description: "Guitars, keyboards, DJ equipment" },
   { id: "baby", name: "Baby & Kids", icon: Baby, description: "Clothing, toys, strollers, safety gear" },
   { id: "sports", name: "Sports & Outdoors", icon: Truck, description: "Sports equipment, outdoor gear, camping" },
-  { id: "tools", name: "Tools & Hardware", icon: Tool, description: "Power tools, hand tools, hardware supplies" },
+  { id: "tools", name: "Tools & Hardware", icon: Wrench, description: "Power tools, hand tools, hardware supplies" },
   { id: "health", name: "Health & Beauty", icon: Heart, description: "Skincare, makeup, vitamins, supplements" },
   { id: "food", name: "Food & Beverages", icon: Coffee, description: "Gourmet foods, specialty drinks, snacks" },
   { id: "computers", name: "Computers & Tablets", icon: Laptop, description: "Desktops, laptops, tablets, accessories" },
@@ -47,7 +46,6 @@ const Categories = () => {
   const navigate = useNavigate();
 
   const handleCategoryClick = (categoryId: string) => {
-    // Navigate to the main page with the category filter applied
     navigate(`/?category=${categoryId}`);
   };
 
