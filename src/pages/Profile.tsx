@@ -18,6 +18,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("listings");
 
   useEffect(() => {
     // Check if the user is logged in
@@ -47,6 +48,30 @@ const Profile = () => {
       description: "You have been signed out successfully",
     });
     navigate("/sign-in");
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
+  const handleSidebarButtonClick = (section: string) => {
+    // Handle sidebar button clicks
+    switch (section) {
+      case "orders":
+        setActiveTab("purchases");
+        break;
+      case "favorites":
+        toast({
+          title: "Favorites",
+          description: "Viewing your favorite items",
+        });
+        break;
+      case "settings":
+        setActiveTab("settings");
+        break;
+      default:
+        break;
+    }
   };
 
   if (isLoading || !user) {
@@ -84,33 +109,37 @@ const Profile = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start" asChild>
-                    <div className="cursor-pointer">
-                      <Package className="mr-2 h-5 w-5" />
-                      My Orders
-                    </div>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start" 
+                    onClick={() => handleSidebarButtonClick("orders")}
+                  >
+                    <Package className="mr-2 h-5 w-5" />
+                    My Orders
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" asChild>
-                    <div className="cursor-pointer">
-                      <Heart className="mr-2 h-5 w-5" />
-                      Favorites
-                    </div>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start" 
+                    onClick={() => handleSidebarButtonClick("favorites")}
+                  >
+                    <Heart className="mr-2 h-5 w-5" />
+                    Favorites
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" asChild>
-                    <div className="cursor-pointer">
-                      <Settings className="mr-2 h-5 w-5" />
-                      Settings
-                    </div>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start" 
+                    onClick={() => handleSidebarButtonClick("settings")}
+                  >
+                    <Settings className="mr-2 h-5 w-5" />
+                    Settings
                   </Button>
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50" 
                     onClick={handleSignOut}
                   >
-                    <div className="cursor-pointer flex items-center">
-                      <LogOut className="mr-2 h-5 w-5" />
-                      Sign Out
-                    </div>
+                    <LogOut className="mr-2 h-5 w-5" />
+                    Sign Out
                   </Button>
                 </div>
               </div>
@@ -118,7 +147,7 @@ const Profile = () => {
             
             {/* Profile Content */}
             <div className="md:w-3/4">
-              <Tabs defaultValue="listings">
+              <Tabs value={activeTab} onValueChange={handleTabChange}>
                 <TabsList className="mb-6">
                   <TabsTrigger value="listings">My Listings</TabsTrigger>
                   <TabsTrigger value="purchases">My Purchases</TabsTrigger>

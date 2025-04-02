@@ -28,6 +28,8 @@ const SignIn = () => {
       const user = {
         name: email.split('@')[0], // Extract name from email
         email: email,
+        phone: "+1 123-456-7890", // Mock phone number
+        location: "New York, USA", // Mock location
         memberSince: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long'

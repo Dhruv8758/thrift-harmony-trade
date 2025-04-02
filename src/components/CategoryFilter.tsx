@@ -9,6 +9,7 @@ export type Category = {
   name: string;
 };
 
+// Expanded category list with more items
 const categories: Category[] = [
   { id: "1", name: "Clothing" },
   { id: "2", name: "Electronics" },
@@ -18,6 +19,14 @@ const categories: Category[] = [
   { id: "6", name: "Toys & Games" },
   { id: "7", name: "Beauty & Personal Care" },
   { id: "8", name: "Jewelry" },
+  { id: "9", name: "Automotive" },
+  { id: "10", name: "Health & Wellness" },
+  { id: "11", name: "Pet Supplies" },
+  { id: "12", name: "Tools & Home Improvement" },
+  { id: "13", name: "Office Supplies" },
+  { id: "14", name: "Musical Instruments" },
+  { id: "15", name: "Groceries" },
+  { id: "16", name: "Baby Products" },
 ];
 
 interface CategoryFilterProps {
@@ -31,7 +40,7 @@ const CategoryFilter = ({ onCategorySelect, selectedCategory }: CategoryFilterPr
 
   const handleCategoryClick = (categoryId: string | null) => {
     onCategorySelect(categoryId);
-    // Optional: Also update the URL
+    // Update the URL when a category is selected
     if (categoryId) {
       navigate(`/?category=${categoryId}`);
     } else {

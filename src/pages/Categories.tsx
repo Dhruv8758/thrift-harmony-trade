@@ -1,7 +1,7 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Smartphone, 
   Shirt, 
@@ -15,7 +15,12 @@ import {
   Music, 
   Baby, 
   Truck,
-  ChevronRight
+  ChevronRight,
+  Tool,
+  Heart,
+  Coffee,
+  Laptop,
+  Pencil
 } from "lucide-react";
 
 const categories = [
@@ -31,9 +36,21 @@ const categories = [
   { id: "music", name: "Musical Instruments", icon: Music, description: "Guitars, keyboards, DJ equipment" },
   { id: "baby", name: "Baby & Kids", icon: Baby, description: "Clothing, toys, strollers, safety gear" },
   { id: "sports", name: "Sports & Outdoors", icon: Truck, description: "Sports equipment, outdoor gear, camping" },
+  { id: "tools", name: "Tools & Hardware", icon: Tool, description: "Power tools, hand tools, hardware supplies" },
+  { id: "health", name: "Health & Beauty", icon: Heart, description: "Skincare, makeup, vitamins, supplements" },
+  { id: "food", name: "Food & Beverages", icon: Coffee, description: "Gourmet foods, specialty drinks, snacks" },
+  { id: "computers", name: "Computers & Tablets", icon: Laptop, description: "Desktops, laptops, tablets, accessories" },
+  { id: "art", name: "Art & Craft Supplies", icon: Pencil, description: "Paints, canvas, crafting materials" },
 ];
 
 const Categories = () => {
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryId: string) => {
+    // Navigate to the main page with the category filter applied
+    navigate(`/?category=${categoryId}`);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -45,10 +62,10 @@ const Categories = () => {
           {categories.map((category) => {
             const Icon = category.icon;
             return (
-              <Link 
+              <div 
                 key={category.id}
-                to={`/?category=${category.id}`}
-                className="bg-white p-6 rounded-lg border hover:border-scrapeGenie-300 hover:shadow-md transition-all group"
+                onClick={() => handleCategoryClick(category.id)}
+                className="bg-white p-6 rounded-lg border hover:border-scrapeGenie-300 hover:shadow-md transition-all group cursor-pointer"
               >
                 <div className="flex items-start">
                   <div className="mr-4 p-3 bg-scrapeGenie-50 rounded-full text-scrapeGenie-600">
@@ -60,7 +77,7 @@ const Categories = () => {
                   </div>
                   <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-scrapeGenie-600 group-hover:translate-x-1 transition-transform" />
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
