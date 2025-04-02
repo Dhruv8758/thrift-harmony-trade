@@ -24,12 +24,25 @@ const SignIn = () => {
     
     // Simulate sign in
     setTimeout(() => {
+      // Create a mock user object
+      const user = {
+        name: email.split('@')[0], // Extract name from email
+        email: email,
+        memberSince: new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long'
+        })
+      };
+      
+      // Store user in localStorage
+      localStorage.setItem("currentUser", JSON.stringify(user));
+      
       setIsLoading(false);
       toast({
         title: "Sign in successful",
         description: "Welcome back to ScrapeGenie!",
       });
-      navigate("/");
+      navigate("/profile");
     }, 1500);
   };
 
