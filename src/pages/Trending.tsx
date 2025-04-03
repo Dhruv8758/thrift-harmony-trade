@@ -5,11 +5,13 @@ import ProductCard from "@/components/ProductCard";
 import { dummyProducts } from "@/data/products";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 const Trending = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const categoryParam = searchParams.get('category');
+  const { toast } = useToast();
   
   // Use a subset of products as trending products - different categories
   const trendingProducts = dummyProducts.filter((product, index) => 
@@ -24,11 +26,21 @@ const Trending = () => {
       const filtered = trendingProducts.filter(
         product => product.category === categoryParam
       );
-      setFilteredProducts(filtered.length > 0 ? filtered : trendingProducts);
+      
+      setFilteredProducts(filtered);
+      
+      // Show notification if no products are found
+      if (filtered.length === 0) {
+        toast({
+          title: "No trending products found",
+          description: `No trending products found in the "${categoryParam}" category.`,
+          variant: "destructive",
+        });
+      }
     } else {
       setFilteredProducts(trendingProducts);
     }
-  }, [categoryParam]);
+  }, [categoryParam, toast]);
 
   return (
     <div className="flex flex-col min-h-screen">

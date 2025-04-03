@@ -9,7 +9,7 @@ export type Category = {
   name: string;
 };
 
-// Updated to match the categories in Categories.tsx
+// Updated to match all categories in Categories.tsx
 const categories: Category[] = [
   { id: "electronics", name: "Electronics" },
   { id: "clothing", name: "Clothing & Accessories" },
