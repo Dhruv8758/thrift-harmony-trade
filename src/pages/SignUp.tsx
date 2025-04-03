@@ -9,11 +9,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ArrowLeft, Mail, Lock, Github, Chrome } from "lucide-react";
+import { ArrowLeft, Mail, Lock, User, Github, Chrome } from "lucide-react";
 
-const SignIn = () => {
+const SignUp = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -22,14 +23,14 @@ const SignIn = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate sign in
+    // Simulate sign up
     setTimeout(() => {
-      // Create a mock user object
+      // Create a user object
       const user = {
-        name: email.split('@')[0], // Extract name from email
+        name: name,
         email: email,
-        phone: "+1 123-456-7890", // Mock phone number
-        location: "New York, USA", // Mock location
+        phone: "", // Empty for new users
+        location: "", // Empty for new users
         memberSince: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long'
@@ -41,24 +42,24 @@ const SignIn = () => {
       
       setIsLoading(false);
       toast({
-        title: "Sign in successful",
-        description: "Welcome back to ScrapeGenie!",
+        title: "Account created successfully",
+        description: "Welcome to ScrapeGenie!",
       });
       navigate("/profile");
     }, 1500);
   };
 
-  const handleSocialLogin = (provider: string) => {
+  const handleSocialSignUp = (provider: string) => {
     setIsLoading(true);
     
-    // Simulate social sign in
+    // Simulate social sign up
     setTimeout(() => {
-      // Create a mock user object for social login
+      // Create a mock user object for social signup
       const user = {
         name: provider === "GitHub" ? "GitHubUser" : "GoogleUser",
         email: `user@${provider.toLowerCase()}.com`,
-        phone: "+1 123-456-7890", // Mock phone number
-        location: "San Francisco, USA", // Mock location
+        phone: "", // Empty for new users
+        location: "", // Empty for new users
         memberSince: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long'
@@ -70,7 +71,7 @@ const SignIn = () => {
       
       setIsLoading(false);
       toast({
-        title: `${provider} sign in successful`,
+        title: `${provider} sign up successful`,
         description: "Welcome to ScrapeGenie!",
       });
       navigate("/profile");
@@ -88,9 +89,25 @@ const SignIn = () => {
         </Link>
         
         <div className="bg-white p-8 rounded-lg border shadow-sm">
-          <h1 className="text-2xl font-bold mb-6 text-center">Sign In to ScrapeGenie</h1>
+          <h1 className="text-2xl font-bold mb-6 text-center">Create an Account</h1>
           
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  className="pl-10"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -108,12 +125,7 @@ const SignIn = () => {
             </div>
             
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link to="/forgot-password" className="text-xs text-scrapeGenie-600 hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -129,12 +141,21 @@ const SignIn = () => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Checkbox id="remember" />
-              <Label htmlFor="remember" className="text-sm font-normal">Remember me for 30 days</Label>
+              <Checkbox id="terms" required />
+              <Label htmlFor="terms" className="text-sm font-normal">
+                I agree to the{" "}
+                <Link to="/terms" className="text-scrapeGenie-600 hover:underline">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link to="/privacy" className="text-scrapeGenie-600 hover:underline">
+                  Privacy Policy
+                </Link>
+              </Label>
             </div>
             
             <Button type="submit" className="w-full bg-scrapeGenie-600 hover:bg-scrapeGenie-700" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
           
@@ -149,7 +170,7 @@ const SignIn = () => {
             <Button 
               variant="outline" 
               className="w-full"
-              onClick={() => handleSocialLogin("GitHub")}
+              onClick={() => handleSocialSignUp("GitHub")}
               disabled={isLoading}
             >
               <Github className="mr-2 h-4 w-4" />
@@ -158,7 +179,7 @@ const SignIn = () => {
             <Button 
               variant="outline" 
               className="w-full"
-              onClick={() => handleSocialLogin("Google")}
+              onClick={() => handleSocialSignUp("Google")}
               disabled={isLoading}
             >
               <Chrome className="mr-2 h-4 w-4" />
@@ -166,22 +187,12 @@ const SignIn = () => {
             </Button>
           </div>
           
-          <div className="mt-6 space-y-4">
-            <p className="text-center text-sm text-gray-500">
-              Don't have an account?{" "}
-              <Link to="/sign-up" className="text-scrapeGenie-600 hover:underline font-medium">
-                Sign up
-              </Link>
-            </p>
-            
-            <div className="text-center">
-              <Link to="/sign-up" className="w-full inline-block">
-                <Button variant="outline" className="w-full">
-                  Create new account
-                </Button>
-              </Link>
-            </div>
-          </div>
+          <p className="text-center mt-6 text-sm text-gray-500">
+            Already have an account?{" "}
+            <Link to="/sign-in" className="text-scrapeGenie-600 hover:underline">
+              Sign in
+            </Link>
+          </p>
         </div>
       </main>
       
@@ -190,4 +201,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;

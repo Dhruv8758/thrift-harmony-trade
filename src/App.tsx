@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Sell from "./pages/Sell";
 import Categories from "./pages/Categories";
 import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import Trending from "./pages/Trending";
 import NewArrivals from "./pages/NewArrivals";
 import Deals from "./pages/Deals";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/sell" element={<Sell />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/sign-up" element={<SignUp />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/new-arrivals" element={<NewArrivals />} />
           <Route path="/deals" element={<Deals />} />

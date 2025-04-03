@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ShoppingBag, User, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, User, Menu, X, Home } from "lucide-react";
 import { 
   CommandDialog, 
   CommandInput, 
@@ -85,6 +85,9 @@ const Navbar = () => {
 
           {/* Nav Links - Hidden on mobile */}
           <div className="hidden md:flex items-center space-x-4">
+            <Link to="/" className="text-gray-600 hover:text-scrapeGenie-600">
+              <Home className="h-5 w-5" />
+            </Link>
             <Link to="/sell" className="text-gray-600 hover:text-scrapeGenie-600">
               Sell
             </Link>
@@ -137,6 +140,14 @@ const Navbar = () => {
               </Button>
             </div>
             <div className="flex flex-col space-y-2 pt-2">
+              <Link
+                to="/"
+                className="text-gray-600 hover:text-scrapeGenie-600 px-2 py-1 flex items-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Link>
               <Link
                 to="/sell"
                 className="text-gray-600 hover:text-scrapeGenie-600 px-2 py-1"
