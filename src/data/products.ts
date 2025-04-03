@@ -1,3 +1,4 @@
+
 import { Product } from "@/components/ProductCard";
 
 export const dummyProducts: Product[] = [
@@ -5,7 +6,7 @@ export const dummyProducts: Product[] = [
     id: "1",
     title: "Vintage Denim Jacket",
     price: 45.99,
-    image: "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&auto=format&fit=crop",
     condition: "Good",
     seller: {
       name: "VintageLover",
@@ -17,7 +18,7 @@ export const dummyProducts: Product[] = [
     id: "2",
     title: "Mechanical Keyboard (Cherry MX)",
     price: 89.99,
-    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1595044778498-b114e8f723e5?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "TechDeals",
@@ -29,7 +30,7 @@ export const dummyProducts: Product[] = [
     id: "3",
     title: "Mid-Century Coffee Table",
     price: 120.00,
-    image: "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1634712282287-14ed57b9cc89?w=800&auto=format&fit=crop",
     condition: "Good",
     seller: {
       name: "HomeDecorPro",
@@ -377,7 +378,7 @@ export const dummyProducts: Product[] = [
     id: "32",
     title: "Children's Bicycle with Training Wheels",
     price: 79.99,
-    image: "https://images.unsplash.com/photo-1575909812264-6902b55846ad?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1532330393533-443990a51d10?w=800&auto=format&fit=crop",
     condition: "Good",
     seller: {
       name: "KidsBikes",
@@ -521,12 +522,156 @@ export const dummyProducts: Product[] = [
     id: "44",
     title: "Premium Skincare Set",
     price: 89.99,
-    image: "https://images.unsplash.com/photo-1556228578-dd539282b954?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1570194065650-d99fb4bedf00?w=800&auto=format&fit=crop",
     condition: "New",
     seller: {
       name: "BeautyEssentials",
       rating: 4.8
     },
     category: "health"
+  },
+  {
+    id: "45",
+    title: "Handcrafted Wooden Baby Toys",
+    price: 35.99,
+    image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "NaturalToys",
+      rating: 4.7
+    },
+    category: "baby"
+  },
+  {
+    id: "46",
+    title: "Baby Stroller - Premium Model",
+    price: 249.99,
+    image: "https://images.unsplash.com/photo-1591106206052-46fc975392c4?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "BabyGear",
+      rating: 4.8
+    },
+    category: "baby"
+  },
+  {
+    id: "47",
+    title: "Baby Carrier Backpack",
+    price: 65.99,
+    image: "https://images.unsplash.com/photo-1567363559774-eadf232e5169?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "OutdoorParent",
+      rating: 4.6
+    },
+    category: "baby"
+  },
+  {
+    id: "48",
+    title: "Children's Art Easel",
+    price: 42.50,
+    image: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "CreativeKids",
+      rating: 4.5
+    },
+    category: "baby"
+  },
+  {
+    id: "49",
+    title: "Infant Clothing Set (0-6 months)",
+    price: 28.99,
+    image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "BabyFashion",
+      rating: 4.7
+    },
+    category: "baby"
+  },
+  {
+    id: "50",
+    title: "Baby Monitor with Camera",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "TechParent",
+      rating: 4.8
+    },
+    category: "baby"
+  },
+  {
+    id: "51",
+    title: "Children's Bookshelf",
+    price: 65.00,
+    image: "https://images.unsplash.com/photo-1544012607-9406c639f33e?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "KidsDecor",
+      rating: 4.6
+    },
+    category: "baby"
+  },
+  {
+    id: "52",
+    title: "Baby Bath Set",
+    price: 32.99,
+    image: "https://images.unsplash.com/photo-1523343221842-d940f5acbb5c?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "BathTime",
+      rating: 4.7
+    },
+    category: "baby"
+  },
+  {
+    id: "53",
+    title: "Kid's Desk and Chair Set",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1554178286-db408c69256a?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "LearningSpace",
+      rating: 4.8
+    },
+    category: "baby"
+  },
+  {
+    id: "54",
+    title: "High Chair for Babies",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1633613286848-e6f43bbafb8d?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "MealTime",
+      rating: 4.5
+    },
+    category: "baby"
+  },
+  {
+    id: "55",
+    title: "Baby Bouncer Seat",
+    price: 45.50,
+    image: "https://images.unsplash.com/photo-1598481569144-858bc2e63ba5?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "BabyComfort",
+      rating: 4.6
+    },
+    category: "baby"
+  },
+  {
+    id: "56",
+    title: "Toddler Activity Table",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "PlayTime",
+      rating: 4.7
+    },
+    category: "baby"
   }
 ];
