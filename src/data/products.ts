@@ -1,4 +1,3 @@
-
 import { Product } from "@/components/ProductCard";
 
 export const dummyProducts: Product[] = [
@@ -265,5 +264,269 @@ export const dummyProducts: Product[] = [
       rating: 4.7
     },
     category: "watches"
+  },
+  {
+    id: "23",
+    title: "Professional Chef Knife Set",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1566454419290-57a64afe30ac?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "KitchenPro",
+      rating: 4.9
+    },
+    category: "kitchen"
+  },
+  {
+    id: "24",
+    title: "Espresso Coffee Machine",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "CoffeeLover",
+      rating: 4.8
+    },
+    category: "kitchen"
+  },
+  {
+    id: "25",
+    title: "Cast Iron Dutch Oven",
+    price: 75.00,
+    image: "https://images.unsplash.com/photo-1585672841769-2072eaef8167?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "HomeChef",
+      rating: 4.7
+    },
+    category: "kitchen"
+  },
+  {
+    id: "26",
+    title: "LEGO Star Wars Set",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1518946222227-364f22132616?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "ToyCollector",
+      rating: 4.9
+    },
+    category: "toys"
+  },
+  {
+    id: "27",
+    title: "Remote Control Drone",
+    price: 149.99,
+    image: "https://images.unsplash.com/photo-1521405924368-64c332b40842?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "TechHobbyist",
+      rating: 4.8
+    },
+    category: "toys"
+  },
+  {
+    id: "28",
+    title: "Vintage Board Game Collection",
+    price: 65.00,
+    image: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "GameNight",
+      rating: 4.6
+    },
+    category: "toys"
+  },
+  {
+    id: "29",
+    title: "Industrial 3D Printer",
+    price: 1299.99,
+    image: "https://images.unsplash.com/photo-1565086536703-1b2e036b7ede?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "TechIndustry",
+      rating: 4.9
+    },
+    category: "business"
+  },
+  {
+    id: "30",
+    title: "Office Ergonomic Chair",
+    price: 249.99,
+    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "OfficeSupplyCo",
+      rating: 4.7
+    },
+    category: "business"
+  },
+  {
+    id: "31",
+    title: "Baby Crib with Mattress",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1586681145018-9ee819de3e52?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "BabyEssentials",
+      rating: 4.9
+    },
+    category: "baby"
+  },
+  {
+    id: "32",
+    title: "Children's Bicycle with Training Wheels",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1575909812264-6902b55846ad?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "KidsBikes",
+      rating: 4.8
+    },
+    category: "baby"
+  },
+  {
+    id: "33",
+    title: "Professional Tennis Racket",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1617546171921-9c8488e04c3e?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "SportsPro",
+      rating: 4.9
+    },
+    category: "sports"
+  },
+  {
+    id: "34",
+    title: "Mountain Climbing Gear Set",
+    price: 249.99,
+    image: "https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "AdventureGear",
+      rating: 4.8
+    },
+    category: "sports"
+  },
+  {
+    id: "35",
+    title: "Premium Digital Watch",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "WatchCollector",
+      rating: 4.9
+    },
+    category: "watches"
+  },
+  {
+    id: "36",
+    title: "Art Supplies Kit",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "ArtistSupply",
+      rating: 4.7
+    },
+    category: "art"
+  },
+  {
+    id: "37",
+    title: "Handcrafted Pottery Set",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "CraftArtisan",
+      rating: 4.8
+    },
+    category: "art"
+  },
+  {
+    id: "38",
+    title: "Electric Power Saw",
+    price: 169.99,
+    image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "ToolMaster",
+      rating: 4.7
+    },
+    category: "tools"
+  },
+  {
+    id: "39",
+    title: "Laptop Stand with Cooling Fan",
+    price: 45.99,
+    image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "TechAccessories",
+      rating: 4.6
+    },
+    category: "computers"
+  },
+  {
+    id: "40",
+    title: "Gaming Desktop Computer",
+    price: 999.99,
+    image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "GamerHub",
+      rating: 4.9
+    },
+    category: "computers"
+  },
+  {
+    id: "41",
+    title: "Organic Food Gift Basket",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "OrganicGoods",
+      rating: 4.7
+    },
+    category: "food"
+  },
+  {
+    id: "42",
+    title: "Designer Sunglasses",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "FashionEye",
+      rating: 4.8
+    },
+    category: "clothing"
+  },
+  {
+    id: "43",
+    title: "Electric Guitar with Amplifier",
+    price: 349.99,
+    image: "https://images.unsplash.com/photo-1550985616-10810253b84d?w=800&auto=format&fit=crop",
+    condition: "Good",
+    seller: {
+      name: "MusicStore",
+      rating: 4.9
+    },
+    category: "music"
+  },
+  {
+    id: "44",
+    title: "Premium Skincare Set",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1556228578-dd539282b954?w=800&auto=format&fit=crop",
+    condition: "New",
+    seller: {
+      name: "BeautyEssentials",
+      rating: 4.8
+    },
+    category: "health"
   }
 ];
