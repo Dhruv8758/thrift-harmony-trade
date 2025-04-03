@@ -2,19 +2,7 @@
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-export type Product = {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
-  condition: "New" | "Like New" | "Good" | "Fair" | "Poor";
-  seller: {
-    name: string;
-    rating: number;
-  };
-  category: string;
-};
+import { Product } from "@/types/product";
 
 const ProductCard = ({ product }: { product: Product }) => {
   // Function to format category name for display

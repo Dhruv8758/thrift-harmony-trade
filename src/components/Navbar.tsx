@@ -13,6 +13,7 @@ import {
   CommandItem 
 } from "@/components/ui/command";
 import { dummyProducts } from "@/data/products";
+import { Product } from "@/types/product";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

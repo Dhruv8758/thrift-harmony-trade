@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import FeaturedProducts from "@/components/FeaturedProducts";
-import ProductCard, { Product } from "@/components/ProductCard";
+import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import PriceRangeFilter from "@/components/PriceRangeFilter";
 import Footer from "@/components/Footer";
@@ -12,6 +12,7 @@ import { dummyProducts } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Product } from "@/types/product";
 
 // Setting maximum price in INR (75 times the previous USD max)
 const MAX_PRICE = 37500; 

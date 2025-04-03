@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { dummyProducts } from "@/data/products";
+import { Product } from "@/types/product";
 
 const Deals = () => {
   // Use products with some randomization to simulate deals

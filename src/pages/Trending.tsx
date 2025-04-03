@@ -6,6 +6,7 @@ import { dummyProducts } from "@/data/products";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Product } from "@/types/product";
 
 const Trending = () => {
   const location = useLocation();
@@ -18,7 +19,7 @@ const Trending = () => {
     index % 3 === 0 || index % 5 === 0
   ).slice(0, 12);
 
-  const [filteredProducts, setFilteredProducts] = useState(trendingProducts);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(trendingProducts);
 
   useEffect(() => {
     if (categoryParam) {

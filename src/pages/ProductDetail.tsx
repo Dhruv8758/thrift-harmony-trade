@@ -1,10 +1,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { dummyProducts } from "@/data/products";
+import { getProductById, dummyProducts } from "@/data/products";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Product } from "@/components/ProductCard";
+import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,14 +38,23 @@ const ProductDetail = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const foundProduct = dummyProducts.find((p) => p.id === id);
-    setProduct(foundProduct || null);
+    if (id) {
+      const foundProduct = getProductById(id);
+      setProduct(foundProduct || null);
 
-    const related = dummyProducts
-      .filter((p) => p.id !== id)
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 4);
-    setRelatedProducts(related);
+      // Find related products from the same category or by the same seller
+      if (foundProduct) {
+        const related = dummyProducts
+          .filter(p => 
+            p.id !== id && 
+            (p.category === foundProduct.category || 
+             p.seller.name === foundProduct.seller.name)
+          )
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 4);
+        setRelatedProducts(related);
+      }
+    }
   }, [id]);
 
   if (!product) {

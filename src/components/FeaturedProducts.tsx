@@ -1,9 +1,10 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ProductCard, { Product } from "./ProductCard";
+import ProductCard from "./ProductCard";
 import { dummyProducts } from "@/data/products";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Product } from "@/types/product";
 
 const FeaturedProducts = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
