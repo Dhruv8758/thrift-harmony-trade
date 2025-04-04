@@ -22,14 +22,24 @@ const SignIn = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate sign in
+    // Simulate sign in with different roles based on email
     setTimeout(() => {
+      let role = "user"; // Default role
+      
+      // Mock role assignment based on email
+      if (email.includes("admin")) {
+        role = "admin";
+      } else if (email.includes("seller")) {
+        role = "seller";
+      }
+      
       // Create a mock user object
       const user = {
         name: email.split('@')[0], // Extract name from email
         email: email,
         phone: "+1 123-456-7890", // Mock phone number
         location: "New York, USA", // Mock location
+        role: role, // Include role
         memberSince: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long'
@@ -42,9 +52,17 @@ const SignIn = () => {
       setIsLoading(false);
       toast({
         title: "Sign in successful",
-        description: "Welcome back to ScrapeGenie!",
+        description: `Welcome back to ScrapeGenie as a ${role}!`,
       });
-      navigate("/profile");
+      
+      // Redirect based on role
+      if (role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (role === "seller") {
+        navigate("/seller-dashboard");
+      } else {
+        navigate("/profile");
+      }
     }, 1500);
   };
 
@@ -59,6 +77,7 @@ const SignIn = () => {
         email: `user@${provider.toLowerCase()}.com`,
         phone: "+1 123-456-7890", // Mock phone number
         location: "San Francisco, USA", // Mock location
+        role: "user", // Default role for social login
         memberSince: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long'
@@ -105,6 +124,12 @@ const SignIn = () => {
                   required
                 />
               </div>
+              <p className="text-xs text-gray-500">
+                Try these emails for different roles:<br/>
+                <span className="font-medium">user@example.com</span> - Regular user<br/>
+                <span className="font-medium">seller@example.com</span> - Seller<br/>
+                <span className="font-medium">admin@example.com</span> - Admin
+              </p>
             </div>
             
             <div className="space-y-2">

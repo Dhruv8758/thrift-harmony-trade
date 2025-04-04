@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
@@ -17,6 +18,7 @@ const SignUp = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +33,7 @@ const SignUp = () => {
         email: email,
         phone: "", // Empty for new users
         location: "", // Empty for new users
+        role: role,
         memberSince: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long'
@@ -43,9 +46,17 @@ const SignUp = () => {
       setIsLoading(false);
       toast({
         title: "Account created successfully",
-        description: "Welcome to ScrapeGenie!",
+        description: `Welcome to ScrapeGenie as a ${role}!`,
       });
-      navigate("/profile");
+      
+      // Redirect based on role
+      if (role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (role === "seller") {
+        navigate("/seller-dashboard");
+      } else {
+        navigate("/profile");
+      }
     }, 1500);
   };
 
@@ -60,6 +71,7 @@ const SignUp = () => {
         email: `user@${provider.toLowerCase()}.com`,
         phone: "", // Empty for new users
         location: "", // Empty for new users
+        role: "user", // Default role for social signup
         memberSince: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long'
@@ -138,6 +150,21 @@ const SignUp = () => {
                   required
                 />
               </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="role">Account Type</Label>
+              <Select defaultValue="user" onValueChange={setRole}>
+                <SelectTrigger id="role">
+                  <SelectValue placeholder="Select account type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">Regular User</SelectItem>
+                  <SelectItem value="seller">Seller</SelectItem>
+                  <SelectItem value="admin">Administrator</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">Choose the type of account you want to create</p>
             </div>
             
             <div className="flex items-center space-x-2">

@@ -24,10 +24,19 @@ const Profile = () => {
     // Check if the user is logged in
     const currentUser = getCurrentUser();
     if (currentUser) {
+      // Redirect based on role
+      if (currentUser.role === "admin") {
+        navigate("/admin-dashboard");
+        return;
+      } else if (currentUser.role === "seller") {
+        navigate("/seller-dashboard");
+        return;
+      }
+      
       setUser(currentUser);
     }
     setIsLoading(false);
-  }, []);
+  }, [navigate]);
 
   // Redirect to sign in if not logged in
   useEffect(() => {
@@ -65,6 +74,7 @@ const Profile = () => {
           title: "Favorites",
           description: "Viewing your favorite items",
         });
+        navigate("/wishlist");
         break;
       case "settings":
         setActiveTab("settings");
@@ -149,25 +159,25 @@ const Profile = () => {
             <div className="md:w-3/4">
               <Tabs value={activeTab} onValueChange={handleTabChange}>
                 <TabsList className="mb-6">
-                  <TabsTrigger value="listings">My Listings</TabsTrigger>
-                  <TabsTrigger value="purchases">My Purchases</TabsTrigger>
+                  <TabsTrigger value="listings">My Purchases</TabsTrigger>
+                  <TabsTrigger value="purchases">Order History</TabsTrigger>
                   <TabsTrigger value="settings">Account Settings</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="listings" className="bg-white p-6 rounded-lg shadow-sm border">
-                  <h3 className="text-xl font-semibold mb-4">My Listings</h3>
-                  <div className="text-center py-8 text-gray-500">
-                    <Package className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                    <p className="mb-2">You haven't listed any items yet</p>
-                    <Button onClick={() => navigate("/sell")}>List an Item</Button>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="purchases" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-4">My Purchases</h3>
                   <div className="text-center py-8 text-gray-500">
                     <Package className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                     <p className="mb-2">You haven't purchased any items yet</p>
+                    <Button onClick={() => navigate("/")}>Start Shopping</Button>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="purchases" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-4">Order History</h3>
+                  <div className="text-center py-8 text-gray-500">
+                    <Package className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <p className="mb-2">You haven't ordered any items yet</p>
                     <Button onClick={() => navigate("/")}>Start Shopping</Button>
                   </div>
                 </TabsContent>
@@ -190,6 +200,10 @@ const Profile = () => {
                     <div>
                       <h4 className="font-medium mb-1">Location</h4>
                       <p>{user.location || "Not provided"}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Account Type</h4>
+                      <p className="capitalize">{user.role || "Regular User"}</p>
                     </div>
                   </div>
                 </TabsContent>

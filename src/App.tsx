@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import SellerDashboard from "./pages/SellerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Sell from "./pages/Sell";
 import Categories from "./pages/Categories";
 import SignIn from "./pages/SignIn";
@@ -38,6 +40,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/seller-dashboard" element={<SellerDashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/sell" element={<Sell />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/sign-in" element={<SignIn />} />
