@@ -17,6 +17,8 @@ import { artProducts } from "./art";
 import { computersProducts } from "./computers";
 import { foodProducts } from "./food";
 import { healthProducts } from "./health";
+import { jewelryProducts } from "./jewelry";
+import { furnitureProducts } from "./furniture";
 
 // Combine all products into a single array
 export const dummyProducts: Product[] = [
@@ -36,7 +38,9 @@ export const dummyProducts: Product[] = [
   ...artProducts,
   ...computersProducts,
   ...foodProducts,
-  ...healthProducts
+  ...healthProducts,
+  ...jewelryProducts,
+  ...furnitureProducts
 ];
 
 // Export each category separately
@@ -57,7 +61,9 @@ export {
   artProducts,
   computersProducts,
   foodProducts,
-  healthProducts
+  healthProducts,
+  jewelryProducts,
+  furnitureProducts
 };
 
 // Get products by category
@@ -68,4 +74,11 @@ export const getProductsByCategory = (category: string): Product[] => {
 // Get product by ID
 export const getProductById = (id: string): Product | undefined => {
   return dummyProducts.find(product => product.id === id);
+};
+
+// Simple function to get featured products
+export const getFeaturedProducts = (limit = 4): Product[] => {
+  return dummyProducts
+    .sort(() => 0.5 - Math.random()) // Simple randomization
+    .slice(0, limit);
 };
