@@ -6,7 +6,7 @@ export const healthProducts: Product[] = [
     id: "44",
     title: "Premium Skincare Set",
     price: 89.99,
-    image: "https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop",
     condition: "New",
     seller: {
       name: "BeautyEssentials",

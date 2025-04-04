@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 
 export const homeProducts: Product[] = [
@@ -5,7 +6,7 @@ export const homeProducts: Product[] = [
     id: "home1",
     title: "Handmade Ceramic Vase",
     price: 45.99,
-    image: "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1578500351865-d6c3969872ed?w=800&auto=format&fit=crop",
     condition: "New",
     seller: {
       name: "ArtisanCrafts",

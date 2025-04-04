@@ -6,7 +6,7 @@ export const electronicsProducts: Product[] = [
     id: "2",
     title: "Mechanical Keyboard (Cherry MX)",
     price: 89.99,
-    image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1601445638532-3c6f6c3aa1d6?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "TechDeals",
@@ -18,7 +18,7 @@ export const electronicsProducts: Product[] = [
     id: "6",
     title: "Nintendo Switch with 2 Games",
     price: 240.00,
-    image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1587825045755-a34305e56502?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "GamersParadise",

@@ -12,11 +12,17 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <div className="product-card group">
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-t-lg">
         <img
           src={product.image}
           alt={product.title}
           className="product-card-image group-hover:scale-105 transition-transform duration-300 h-48 w-full object-cover"
+          onError={(e) => {
+            // Fallback image if the original image fails to load
+            const target = e.target as HTMLImageElement;
+            target.src = "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&auto=format&fit=crop";
+            target.onerror = null; // Prevent infinite fallback loop
+          }}
         />
         <Button
           variant="ghost"
@@ -30,7 +36,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         </div>
       </div>
       
-      <div className="product-card-content p-4">
+      <div className="product-card-content p-4 bg-white rounded-b-lg shadow">
         <Link to={`/product/${product.id}`}>
           <h3 className="product-card-title font-medium hover:text-scrapeGenie-600 transition-colors">{product.title}</h3>
         </Link>

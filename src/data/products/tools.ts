@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 
 export const toolsProducts: Product[] = [
@@ -5,7 +6,7 @@ export const toolsProducts: Product[] = [
     id: "tools1",
     title: "Power Driller Set",
     price: 129.99,
-    image: "https://images.unsplash.com/photo-1616403964045-75a00d0c0c19?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1622043578000-b8f87a9255e5?w=800&auto=format&fit=crop",
     condition: "Good",
     seller: {
       name: "ToolMaster",

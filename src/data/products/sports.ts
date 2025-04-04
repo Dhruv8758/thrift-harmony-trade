@@ -6,7 +6,7 @@ export const sportsProducts: Product[] = [
     id: "sports1",
     title: "Professional Tennis Racket",
     price: 159.99,
-    image: "https://images.unsplash.com/photo-1617183996931-5b197e7d84d2?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1617083304161-1d4248e9c7d8?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "SportsPro",

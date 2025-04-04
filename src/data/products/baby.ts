@@ -1,4 +1,3 @@
-
 import { Product } from "@/types/product";
 
 export const babyProducts: Product[] = [
@@ -6,7 +5,7 @@ export const babyProducts: Product[] = [
     id: "31",
     title: "Baby Crib with Mattress",
     price: 199.99,
-    image: "https://images.unsplash.com/photo-1586426006295-050235178cad?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1586091450865-4a463ad00a9a?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "BabyEssentials",
@@ -42,7 +41,7 @@ export const babyProducts: Product[] = [
     id: "46",
     title: "Baby Stroller - Premium Model",
     price: 249.99,
-    image: "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "BabyGear",
@@ -54,7 +53,7 @@ export const babyProducts: Product[] = [
     id: "47",
     title: "Baby Carrier Backpack",
     price: 65.99,
-    image: "https://images.unsplash.com/photo-1529114281759-4d981786489e?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1590004046095-3dbefeae9a1a?w=800&auto=format&fit=crop",
     condition: "Good",
     seller: {
       name: "OutdoorParent",
@@ -114,7 +113,7 @@ export const babyProducts: Product[] = [
     id: "52",
     title: "Baby Bath Set",
     price: 32.99,
-    image: "https://images.unsplash.com/photo-1611612619906-caa2d7699e39?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1584555613483-3b107cda2510?w=800&auto=format&fit=crop",
     condition: "New",
     seller: {
       name: "BathTime",

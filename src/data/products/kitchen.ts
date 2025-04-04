@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 
 export const kitchenProducts: Product[] = [
@@ -5,7 +6,7 @@ export const kitchenProducts: Product[] = [
     id: "kitchen1",
     title: "Cast Iron Dutch Oven",
     price: 89.99,
-    image: "https://images.unsplash.com/photo-1631551759920-0f16e65358b7?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1619740455993-a78253b04a62?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "KitchenPro",

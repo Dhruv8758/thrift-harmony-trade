@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 
 export const toysProducts: Product[] = [
@@ -5,7 +6,7 @@ export const toysProducts: Product[] = [
     id: "toys1",
     title: "Remote Control Drone",
     price: 199.99,
-    image: "https://images.unsplash.com/photo-1579829366248-204fe8413f31?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1581092671424-9f54e155d101?w=800&auto=format&fit=crop",
     condition: "New",
     seller: {
       name: "TechToys",
