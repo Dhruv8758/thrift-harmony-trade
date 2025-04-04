@@ -1,13 +1,51 @@
 
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/types/product";
+import { toast } from "@/components/ui/use-toast";
 
 const ProductCard = ({ product }: { product: Product }) => {
-  // Function to format category name for display
+  // Check if product is in wishlist
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  
+  // Format category name for display
   const formatCategoryName = (category: string) => {
     return category.charAt(0).toUpperCase() + category.slice(1);
+  };
+
+  // Load wishlist state on component mount
+  useEffect(() => {
+    const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+    setIsInWishlist(wishlist.some((item: Product) => item.id === product.id));
+  }, [product.id]);
+
+  // Toggle wishlist
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation to product detail
+    
+    const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+    
+    if (isInWishlist) {
+      // Remove from wishlist
+      const newWishlist = wishlist.filter((item: Product) => item.id !== product.id);
+      localStorage.setItem("wishlist", JSON.stringify(newWishlist));
+      setIsInWishlist(false);
+      toast({
+        title: "Removed from wishlist",
+        description: `${product.title} has been removed from your wishlist`,
+      });
+    } else {
+      // Add to wishlist
+      wishlist.push(product);
+      localStorage.setItem("wishlist", JSON.stringify(wishlist));
+      setIsInWishlist(true);
+      toast({
+        title: "Added to wishlist",
+        description: `${product.title} has been added to your wishlist`,
+      });
+    }
   };
 
   return (
@@ -28,8 +66,11 @@ const ProductCard = ({ product }: { product: Product }) => {
           variant="ghost"
           size="icon"
           className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full h-8 w-8"
+          onClick={toggleWishlist}
         >
-          <Heart className="h-5 w-5 text-gray-600 hover:text-red-500" />
+          <Heart 
+            className={`h-5 w-5 ${isInWishlist ? 'text-red-500 fill-red-500' : 'text-gray-600'} hover:text-red-500`} 
+          />
         </Button>
         <div className="absolute top-2 left-2 bg-scrapeGenie-500 text-white px-2 py-1 text-xs rounded-full">
           {formatCategoryName(product.category)}

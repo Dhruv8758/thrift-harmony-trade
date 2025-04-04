@@ -6,7 +6,7 @@ export const toolsProducts: Product[] = [
     id: "tools1",
     title: "Power Driller Set",
     price: 129.99,
-    image: "https://images.unsplash.com/photo-1622043578000-b8f87a9255e5?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1572981779307-38571c09e16b?w=800&auto=format&fit=crop",
     condition: "Good",
     seller: {
       name: "ToolMaster",
@@ -19,7 +19,7 @@ export const toolsProducts: Product[] = [
     id: "81",
     title: "Cordless Screwdriver",
     price: 39.99,
-    image: "https://images.unsplash.com/photo-1622543458610-941692893bb1?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "HandyTools",
@@ -32,7 +32,7 @@ export const toolsProducts: Product[] = [
     id: "82",
     title: "Adjustable Wrench Set",
     price: 54.50,
-    image: "https://images.unsplash.com/photo-1617835541784-16520221ca99?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=800&auto=format&fit=crop",
     condition: "New",
     seller: {
       name: "WrenchWorld",
