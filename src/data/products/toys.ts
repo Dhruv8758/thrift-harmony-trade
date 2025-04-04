@@ -1,40 +1,52 @@
-
 import { Product } from "@/types/product";
 
 export const toysProducts: Product[] = [
   {
-    id: "26",
-    title: "LEGO Star Wars Set",
-    price: 89.99,
-    image: "https://images.unsplash.com/photo-1518946222227-364f22132616?w=800&auto=format&fit=crop",
+    id: "toys1",
+    title: "Remote Control Drone",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1579829366248-204fe8413f31?w=800&auto=format&fit=crop",
     condition: "New",
     seller: {
-      name: "ToyCollector",
+      name: "TechToys",
       rating: 4.9
     },
-    category: "toys"
+    category: "toys",
+    description: "High-performance remote control drone with HD camera and stabilizer. Great for aerial photography."
   },
   {
-    id: "27",
-    title: "Remote Control Drone",
-    price: 149.99,
-    image: "https://images.unsplash.com/photo-1521405924368-64c332b40842?w=800&auto=format&fit=crop",
-    condition: "Like New",
+    id: "41",
+    title: "Building Blocks Set",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1587405170988-2532c0b89e5b?w=800&auto=format&fit=crop",
+    condition: "New",
     seller: {
-      name: "TechHobbyist",
-      rating: 4.8
+      name: "CreativeKids",
+      rating: 4.7
     },
     category: "toys"
   },
   {
-    id: "28",
-    title: "Vintage Board Game Collection",
-    price: 65.00,
-    image: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&auto=format&fit=crop",
-    condition: "Good",
+    id: "42",
+    title: "Classic Board Game Collection",
+    price: 39.50,
+    image: "https://images.unsplash.com/photo-1588943219002-cbeca3959831?w=800&auto=format&fit=crop",
+    condition: "Like New",
     seller: {
       name: "GameNight",
       rating: 4.6
+    },
+    category: "toys"
+  },
+  {
+    id: "43",
+    title: "Educational Robot Kit",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1614353393556-9de588992c65?w=800&auto=format&fit=crop",
+    condition: "Like New",
+    seller: {
+      name: "FutureTech",
+      rating: 4.8
     },
     category: "toys"
   }

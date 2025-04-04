@@ -6,7 +6,7 @@ export const electronicsProducts: Product[] = [
     id: "2",
     title: "Mechanical Keyboard (Cherry MX)",
     price: 89.99,
-    image: "https://images.unsplash.com/photo-1595044778498-b114e8f723e5?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "TechDeals",

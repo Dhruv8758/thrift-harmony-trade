@@ -6,7 +6,7 @@ export const babyProducts: Product[] = [
     id: "31",
     title: "Baby Crib with Mattress",
     price: 199.99,
-    image: "https://images.unsplash.com/photo-1586681145018-9ee819de3e52?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1586426006295-050235178cad?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "BabyEssentials",
@@ -42,7 +42,7 @@ export const babyProducts: Product[] = [
     id: "46",
     title: "Baby Stroller - Premium Model",
     price: 249.99,
-    image: "https://images.unsplash.com/photo-1591106206052-46fc975392c4?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "BabyGear",
@@ -54,7 +54,7 @@ export const babyProducts: Product[] = [
     id: "47",
     title: "Baby Carrier Backpack",
     price: 65.99,
-    image: "https://images.unsplash.com/photo-1567363559774-eadf232e5169?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1529114281759-4d981786489e?w=800&auto=format&fit=crop",
     condition: "Good",
     seller: {
       name: "OutdoorParent",
@@ -102,7 +102,7 @@ export const babyProducts: Product[] = [
     id: "51",
     title: "Children's Bookshelf",
     price: 65.00,
-    image: "https://images.unsplash.com/photo-1544012607-9406c639f33e?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=800&auto=format&fit=crop",
     condition: "Good",
     seller: {
       name: "KidsDecor",
@@ -114,7 +114,7 @@ export const babyProducts: Product[] = [
     id: "52",
     title: "Baby Bath Set",
     price: 32.99,
-    image: "https://images.unsplash.com/photo-1523343221842-d940f5acbb5c?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1611612619906-caa2d7699e39?w=800&auto=format&fit=crop",
     condition: "New",
     seller: {
       name: "BathTime",
@@ -150,7 +150,7 @@ export const babyProducts: Product[] = [
     id: "55",
     title: "Baby Bouncer Seat",
     price: 45.50,
-    image: "https://images.unsplash.com/photo-1598481569144-858bc2e63ba5?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1526664781927-07f93499f8d5?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "BabyComfort",

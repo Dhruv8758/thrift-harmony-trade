@@ -3,16 +3,17 @@ import { Product } from "@/types/product";
 
 export const sportsProducts: Product[] = [
   {
-    id: "33",
+    id: "sports1",
     title: "Professional Tennis Racket",
-    price: 129.99,
-    image: "https://images.unsplash.com/photo-1617546171921-9c8488e04c3e?w=800&auto=format&fit=crop",
+    price: 159.99,
+    image: "https://images.unsplash.com/photo-1617183996931-5b197e7d84d2?w=800&auto=format&fit=crop",
     condition: "Like New",
     seller: {
       name: "SportsPro",
-      rating: 4.9
+      rating: 4.8
     },
-    category: "sports"
+    category: "sports",
+    description: "Professional-grade tennis racket with perfect balance and control. Used by competitive players."
   },
   {
     id: "34",
