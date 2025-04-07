@@ -4,6 +4,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
@@ -36,32 +39,62 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/seller-dashboard" element={<SellerDashboard />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/sell" element={<Sell />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/sign-in" element={<SignIn />} />
-          <Route path="/sign-up" element={<SignUp />} />
-          <Route path="/trending" element={<Trending />} />
-          <Route path="/new-arrivals" element={<NewArrivals />} />
-          <Route path="/deals" element={<Deals />} />
-          <Route path="/start-selling" element={<StartSelling />} />
-          <Route path="/seller-tools" element={<SellerTools />} />
-          <Route path="/seller-guidelines" element={<SellerGuidelines />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/cookies" element={<Cookies />} />
-          <Route path="/simple-products" element={<SimpleProducts />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/trending" element={<Trending />} />
+            <Route path="/new-arrivals" element={<NewArrivals />} />
+            <Route path="/deals" element={<Deals />} />
+            <Route path="/start-selling" element={<StartSelling />} />
+            <Route path="/seller-tools" element={<SellerTools />} />
+            <Route path="/seller-guidelines" element={<SellerGuidelines />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/cookies" element={<Cookies />} />
+            <Route path="/simple-products" element={<SimpleProducts />} />
+            
+            {/* Protected routes - User only */}
+            <Route path="/profile" element={
+              <ProtectedRoute allowedRoles={['user', 'seller', 'admin']}>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/wishlist" element={
+              <ProtectedRoute allowedRoles={['user', 'seller', 'admin']}>
+                <Wishlist />
+              </ProtectedRoute>
+            } />
+            
+            {/* Protected routes - Seller only */}
+            <Route path="/seller-dashboard" element={
+              <ProtectedRoute allowedRoles={['seller', 'admin']}>
+                <SellerDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/sell" element={
+              <ProtectedRoute allowedRoles={['seller', 'admin']}>
+                <Sell />
+              </ProtectedRoute>
+            } />
+            
+            {/* Protected routes - Admin only */}
+            <Route path="/admin-dashboard" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

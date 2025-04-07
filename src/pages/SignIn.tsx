@@ -1,99 +1,30 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ArrowLeft, Mail, Lock, Github, Chrome } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignIn = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signIn, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate sign in with different roles based on email
-    setTimeout(() => {
-      let role = "user"; // Default role
-      
-      // Mock role assignment based on email
-      if (email.includes("admin")) {
-        role = "admin";
-      } else if (email.includes("seller")) {
-        role = "seller";
-      }
-      
-      // Create a mock user object
-      const user = {
-        name: email.split('@')[0], // Extract name from email
-        email: email,
-        phone: "+1 123-456-7890", // Mock phone number
-        location: "New York, USA", // Mock location
-        role: role, // Include role
-        memberSince: new Date().toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long'
-        })
-      };
-      
-      // Store user in localStorage
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      
-      setIsLoading(false);
-      toast({
-        title: "Sign in successful",
-        description: `Welcome back to ScrapeGenie as a ${role}!`,
-      });
-      
-      // Redirect based on role
-      if (role === "admin") {
-        navigate("/admin-dashboard");
-      } else if (role === "seller") {
-        navigate("/seller-dashboard");
-      } else {
-        navigate("/profile");
-      }
-    }, 1500);
+    await signIn(email, password);
   };
 
   const handleSocialLogin = (provider: string) => {
-    setIsLoading(true);
-    
-    // Simulate social sign in
-    setTimeout(() => {
-      // Create a mock user object for social login
-      const user = {
-        name: provider === "GitHub" ? "GitHubUser" : "GoogleUser",
-        email: `user@${provider.toLowerCase()}.com`,
-        phone: "+1 123-456-7890", // Mock phone number
-        location: "San Francisco, USA", // Mock location
-        role: "user", // Default role for social login
-        memberSince: new Date().toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long'
-        })
-      };
-      
-      // Store user in localStorage
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      
-      setIsLoading(false);
-      toast({
-        title: `${provider} sign in successful`,
-        description: "Welcome to ScrapeGenie!",
-      });
-      navigate("/profile");
-    }, 1500);
+    // Mock social login by using a default email based on provider
+    const socialEmail = provider === "GitHub" ? "user@github.com" : "user@google.com";
+    signIn(socialEmail, "password123");
   };
 
   return (

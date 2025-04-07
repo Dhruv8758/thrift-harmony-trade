@@ -1,93 +1,34 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ArrowLeft, Mail, Lock, User, Github, Chrome } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signUp, isLoading } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate sign up
-    setTimeout(() => {
-      // Create a user object
-      const user = {
-        name: name,
-        email: email,
-        phone: "", // Empty for new users
-        location: "", // Empty for new users
-        role: role,
-        memberSince: new Date().toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long'
-        })
-      };
-      
-      // Store user in localStorage
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      
-      setIsLoading(false);
-      toast({
-        title: "Account created successfully",
-        description: `Welcome to ScrapeGenie as a ${role}!`,
-      });
-      
-      // Redirect based on role
-      if (role === "admin") {
-        navigate("/admin-dashboard");
-      } else if (role === "seller") {
-        navigate("/seller-dashboard");
-      } else {
-        navigate("/profile");
-      }
-    }, 1500);
+    await signUp(name, email, password, role);
   };
 
   const handleSocialSignUp = (provider: string) => {
-    setIsLoading(true);
-    
-    // Simulate social sign up
-    setTimeout(() => {
-      // Create a mock user object for social signup
-      const user = {
-        name: provider === "GitHub" ? "GitHubUser" : "GoogleUser",
-        email: `user@${provider.toLowerCase()}.com`,
-        phone: "", // Empty for new users
-        location: "", // Empty for new users
-        role: "user", // Default role for social signup
-        memberSince: new Date().toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long'
-        })
-      };
-      
-      // Store user in localStorage
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      
-      setIsLoading(false);
-      toast({
-        title: `${provider} sign up successful`,
-        description: "Welcome to ScrapeGenie!",
-      });
-      navigate("/profile");
-    }, 1500);
+    // Mock social signup by using default values
+    const socialName = provider === "GitHub" ? "GitHubUser" : "GoogleUser";
+    const socialEmail = provider === "GitHub" ? "user@github.com" : "user@google.com";
+    signUp(socialName, socialEmail, "password123", "user");
   };
 
   return (
