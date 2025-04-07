@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
 
 // Define user interface
@@ -29,44 +29,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
     // Check local storage for existing user session
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
-      setUser(JSON.parse(currentUser));
+      try {
+        setUser(JSON.parse(currentUser));
+      } catch (error) {
+        console.error("Failed to parse user from localStorage:", error);
+        localStorage.removeItem('currentUser');
+      }
     }
     setIsLoading(false);
   }, []);
+
+  // Check if user credentials are valid
+  const validateUserCredentials = (email: string, password: string): boolean => {
+    // In a real app, this would check against a database
+    // For now, we'll accept any password that's at least 6 chars
+    return email.includes('@') && password.length >= 6;
+  }
 
   // Sign in function
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
+      // Check if credentials are valid
+      if (!validateUserCredentials(email, password)) {
+        throw new Error("Invalid credentials");
+      }
+      
+      // Check if the user exists in localStorage (simulating database check)
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const existingUser = users.find((u: any) => u.email === email);
+      
+      if (!existingUser) {
+        throw new Error("Account not found. Please sign up first.");
+      }
+      
       // Simulate API call with timeout
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Determine role based on email (mock implementation)
-      let role = "user"; // Default role
-      
-      if (email.includes("admin")) {
-        role = "admin";
-      } else if (email.includes("seller")) {
-        role = "seller";
-      }
-      
-      // Create a mock user object
+      // Create the user object from existing data
       const user = {
-        name: email.split('@')[0], // Extract name from email
-        email: email,
-        phone: "+1 123-456-7890", // Mock phone number
-        location: "New York, USA", // Mock location
-        role: role as 'user' | 'seller' | 'admin', // Include role
-        memberSince: new Date().toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long'
-        })
+        name: existingUser.name,
+        email: existingUser.email,
+        phone: existingUser.phone || "",
+        location: existingUser.location || "",
+        role: existingUser.role as 'user' | 'seller' | 'admin',
+        memberSince: existingUser.memberSince
       };
       
       // Store user in localStorage
@@ -75,21 +89,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       toast({
         title: "Sign in successful",
-        description: `Welcome back to ScrapeGenie as a ${role}!`,
+        description: `Welcome back to ScrapeGenie as a ${user.role}!`,
       });
       
-      // Redirect based on role
-      if (role === "admin") {
+      // Redirect based on role or return URL
+      const from = location.state?.from || '/';
+      
+      if (user.role === "admin") {
         navigate("/admin-dashboard");
-      } else if (role === "seller") {
+      } else if (user.role === "seller") {
         navigate("/seller-dashboard");
       } else {
         navigate("/profile");
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Sign in failed",
-        description: "Please check your credentials and try again",
+        description: error.message || "Please check your credentials and try again",
         variant: "destructive"
       });
     } finally {
@@ -101,15 +117,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (name: string, email: string, password: string, role: string) => {
     setIsLoading(true);
     try {
+      // Check if credentials are valid
+      if (!validateUserCredentials(email, password)) {
+        throw new Error("Invalid email or password too short (min 6 chars)");
+      }
+      
+      // Check if user already exists
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      if (users.some((user: any) => user.email === email)) {
+        throw new Error("Email already registered. Please sign in instead.");
+      }
+      
       // Simulate API call with timeout
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Create user object
-      const user = {
+      const newUser = {
         name: name,
         email: email,
-        phone: "", // Empty for new users
-        location: "", // Empty for new users
+        password: password, // In a real app, this would be hashed
+        phone: "", 
+        location: "",
         role: role as 'user' | 'seller' | 'admin',
         memberSince: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
@@ -117,7 +145,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
       };
       
-      // Store user in localStorage
+      // Store in "database" (localStorage)
+      users.push(newUser);
+      localStorage.setItem('registeredUsers', JSON.stringify(users));
+      
+      // Auto sign-in the new user
+      const user = {
+        name: newUser.name,
+        email: newUser.email,
+        phone: newUser.phone,
+        location: newUser.location,
+        role: newUser.role,
+        memberSince: newUser.memberSince
+      };
+      
       localStorage.setItem("currentUser", JSON.stringify(user));
       setUser(user);
       
@@ -134,10 +175,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         navigate("/profile");
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Sign up failed",
-        description: "Please check your information and try again",
+        description: error.message || "Please check your information and try again",
         variant: "destructive"
       });
     } finally {

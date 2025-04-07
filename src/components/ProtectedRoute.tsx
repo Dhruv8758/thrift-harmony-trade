@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -12,6 +12,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
+  const location = useLocation();
   
   // Show loading state
   if (isLoading) {
@@ -30,7 +31,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
       description: "Please sign in to access this page",
       variant: "destructive",
     });
-    return <Navigate to="/sign-in" replace />;
+    return <Navigate to="/sign-in" state={{ from: location.pathname }} replace />;
   }
   
   // Check role authorization
