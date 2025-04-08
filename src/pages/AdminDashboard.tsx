@@ -17,7 +17,8 @@ import {
   Trash2,
   Eye,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  X
 } from "lucide-react";
 import { 
   Dialog,
@@ -141,14 +142,16 @@ const AdminDashboard = () => {
     setSellers([
       { id: '1', name: 'SportsPro', store: 'Sports Equipment', products: 15, status: 'active' },
       { id: '2', name: 'ElectroGadgets', store: 'Electronics', products: 28, status: 'active' },
-      { id: '3', name: 'HomeDecor', store: 'Home & Garden', products: 32, status: 'review' }
+      { id: '3', name: 'HomeDecor', store: 'Home & Garden', products: 32, status: 'review' },
+      { id: '4', name: 'TechHub', store: 'Technology', products: 45, status: 'suspended' }
     ]);
     
     // Mock products data
     setProducts([
       { id: '1', name: 'Professional Tennis Racket', seller: 'SportsPro', price: '₹12,000', status: 'active' },
       { id: '2', name: 'Mechanical Keyboard', seller: 'ElectroGadgets', price: '₹7,500', status: 'active' },
-      { id: '3', name: 'Handmade Ceramic Vase', seller: 'HomeDecor', price: '₹3,750', status: 'pending' }
+      { id: '3', name: 'Handmade Ceramic Vase', seller: 'HomeDecor', price: '₹3,750', status: 'pending' },
+      { id: '4', name: 'Gaming Mouse', seller: 'TechHub', price: '₹4,500', status: 'flagged' }
     ]);
   };
 
@@ -341,12 +344,17 @@ const AdminDashboard = () => {
       updatedProducts = products.map(p => 
         p.id === product.id ? { ...p, status: 'active' as 'active' } : p
       );
-      message = 'Product has been approved';
+      message = 'Product has been approved and activated';
     } else if (action === 'flag') {
       updatedProducts = products.map(p => 
         p.id === product.id ? { ...p, status: 'flagged' as 'flagged' } : p
       );
       message = 'Product has been flagged for review';
+    } else if (action === 'activate') {
+      updatedProducts = products.map(p => 
+        p.id === product.id ? { ...p, status: 'active' as 'active' } : p
+      );
+      message = 'Product has been activated';
     }
     
     setProducts(updatedProducts);
@@ -370,6 +378,11 @@ const AdminDashboard = () => {
         s.id === seller.id ? { ...s, status: 'suspended' as 'suspended' } : s
       );
       message = 'Seller has been suspended';
+    } else if (action === 'unsuspend') {
+      updatedSellers = sellers.map(s => 
+        s.id === seller.id ? { ...s, status: 'active' as 'active' } : s
+      );
+      message = 'Seller has been unsuspended and is now active';
     }
     
     setSellers(updatedSellers);
@@ -591,7 +604,8 @@ const AdminDashboard = () => {
                                 <Edit className="h-4 w-4 mr-1" />
                                 Edit
                               </Button>
-                              {seller.status === 'review' ? (
+                              
+                              {seller.status === 'review' && (
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
@@ -601,7 +615,9 @@ const AdminDashboard = () => {
                                   <CheckCircle2 className="h-4 w-4 mr-1" />
                                   Approve
                                 </Button>
-                              ) : (
+                              )}
+                              
+                              {seller.status === 'active' && (
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
@@ -609,9 +625,22 @@ const AdminDashboard = () => {
                                   onClick={() => handleSellerAction(seller, 'suspend')}
                                 >
                                   <AlertTriangle className="h-4 w-4 mr-1" />
-                                  {seller.status === 'suspended' ? 'Suspended' : 'Suspend'}
+                                  Suspend
                                 </Button>
                               )}
+                              
+                              {seller.status === 'suspended' && (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="text-green-500" 
+                                  onClick={() => handleSellerAction(seller, 'unsuspend')}
+                                >
+                                  <CheckCircle2 className="h-4 w-4 mr-1" />
+                                  Unsuspend
+                                </Button>
+                              )}
+                              
                               <Button 
                                 size="sm" 
                                 variant="outline" 
@@ -678,7 +707,7 @@ const AdminDashboard = () => {
                                 Edit
                               </Button>
                               
-                              {product.status === 'pending' ? (
+                              {product.status === 'pending' && (
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
@@ -688,7 +717,9 @@ const AdminDashboard = () => {
                                   <CheckCircle2 className="h-4 w-4 mr-1" />
                                   Approve
                                 </Button>
-                              ) : (
+                              )}
+                              
+                              {product.status === 'active' && (
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
@@ -697,6 +728,18 @@ const AdminDashboard = () => {
                                 >
                                   <AlertTriangle className="h-4 w-4 mr-1" />
                                   Flag
+                                </Button>
+                              )}
+                              
+                              {product.status === 'flagged' && (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="text-green-500"
+                                  onClick={() => handleProductAction(product, 'activate')}
+                                >
+                                  <CheckCircle2 className="h-4 w-4 mr-1" />
+                                  Activate
                                 </Button>
                               )}
                               
