@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -91,13 +92,21 @@ const AdminDashboard = () => {
   const [editingSeller, setEditingSeller] = useState<Seller | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   
+  // Add new state for verification dialog
+  const [verificationDialog, setVerificationDialog] = useState(false);
+  const [productToVerify, setProductToVerify] = useState<Product | null>(null);
+  const [healthScoreDialog, setHealthScoreDialog] = useState(false);
+  const [conditionComparisonDialog, setConditionComparisonDialog] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     role: 'user',
     store: '',
     price: '',
-    status: 'active'
+    status: 'active',
+    healthScore: '',
+    verificationStatus: 'Pending' as 'Verified' | 'Pending' | 'Unverified'
   });
   
   useEffect(() => {
@@ -361,6 +370,10 @@ const AdminDashboard = () => {
   
   const handleVerifyProduct = (product: Product) => {
     setProductToVerify(product);
+    setFormData({
+      ...formData,
+      verificationStatus: product.verificationStatus || 'Pending'
+    });
     setVerificationDialog(true);
   };
   
@@ -425,6 +438,9 @@ const AdminDashboard = () => {
     } else if (product.status === 'pending') {
       updatedStatus = 'active';
       message = 'Product has been approved and activated';
+    } else {
+      updatedStatus = 'active';
+      message = 'Product status updated';
     }
     
     const updatedProducts = products.map(p => 
@@ -451,6 +467,9 @@ const AdminDashboard = () => {
     } else if (seller.status === 'review') {
       updatedStatus = 'active';
       message = 'Seller has been approved';
+    } else {
+      updatedStatus = 'active';
+      message = 'Seller status updated';
     }
     
     const updatedSellers = sellers.map(s => 
@@ -478,12 +497,6 @@ const AdminDashboard = () => {
       [name]: value
     });
   };
-
-  // Add new state for verification dialog
-  const [verificationDialog, setVerificationDialog] = useState(false);
-  const [productToVerify, setProductToVerify] = useState<Product | null>(null);
-  const [healthScoreDialog, setHealthScoreDialog] = useState(false);
-  const [conditionComparisonDialog, setConditionComparisonDialog] = useState(false);
 
   if (isLoading || !user) {
     return (
@@ -910,3 +923,515 @@ const AdminDashboard = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div className="bg-gray-50 p-4 rounded-lg border">
+                      <p className="text-sm text-gray-500 mb-1">Total Users</p>
+                      <p className="text-2xl font-bold">{users.length}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <p className="text-sm text-gray-500 mb-1">Active Sellers</p>
+                      <p className="text-2xl font-bold">{sellers.filter(s => s.status === 'active').length}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <p className="text-sm text-gray-500 mb-1">Total Products</p>
+                      <p className="text-2xl font-bold">{products.length}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <p className="text-sm text-gray-500 mb-1">Pending Reviews</p>
+                      <p className="text-2xl font-bold">
+                        {products.filter(p => p.status === 'pending' || p.status === 'flagged').length}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-500 text-center py-10">
+                    Detailed analytics dashboard is under development
+                  </p>
+                </TabsContent>
+                
+                <TabsContent value="settings" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-4">Site Settings</h3>
+                  <p className="text-gray-500 mb-6">Configure platform settings</p>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="text-lg font-medium mb-3">General Settings</h4>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 gap-2">
+                          <Label htmlFor="siteName">Site Name</Label>
+                          <Input type="text" id="siteName" defaultValue="ScrapeGenie" />
+                        </div>
+                        <div className="grid grid-cols-1 gap-2">
+                          <Label htmlFor="siteDescription">Site Description</Label>
+                          <Input 
+                            type="text" 
+                            id="siteDescription" 
+                            defaultValue="A marketplace for second-hand goods with advanced verification tools" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-lg font-medium mb-3">Product Verification</h4>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">Enable Product Verification</p>
+                            <p className="text-sm text-gray-500">
+                              Allow users to verify the condition of products
+                            </p>
+                          </div>
+                          <input 
+                            type="checkbox" 
+                            defaultChecked 
+                            className="h-5 w-5 rounded border-gray-300" 
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">Enable Health Score</p>
+                            <p className="text-sm text-gray-500">
+                              Show product health score on listings
+                            </p>
+                          </div>
+                          <input 
+                            type="checkbox" 
+                            defaultChecked 
+                            className="h-5 w-5 rounded border-gray-300" 
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">Enable Condition Comparison</p>
+                            <p className="text-sm text-gray-500">
+                              Allow users to compare product condition with similar items
+                            </p>
+                          </div>
+                          <input 
+                            type="checkbox" 
+                            defaultChecked 
+                            className="h-5 w-5 rounded border-gray-300" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4">
+                      <Button>Save Settings</Button>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <Footer />
+      
+      {/* User Edit Dialog */}
+      <Dialog open={editUserDialog} onOpenChange={setEditUserDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>Update user information</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input 
+                type="text" 
+                id="name" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                type="email" 
+                id="email" 
+                name="email" 
+                value={formData.email} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="role">Role</Label>
+              <Select value={formData.role} onValueChange={(value) => handleSelectChange('role', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="seller">Seller</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditUserDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveUserChanges}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Add User Dialog */}
+      <Dialog open={addUserDialog} onOpenChange={setAddUserDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+            <DialogDescription>Create a new user account</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input 
+                type="text" 
+                id="name" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                type="email" 
+                id="email" 
+                name="email" 
+                value={formData.email} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="role">Role</Label>
+              <Select value={formData.role} onValueChange={(value) => handleSelectChange('role', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="seller">Seller</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddUserDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveNewUser}>
+              Add User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Seller Dialog */}
+      <Dialog open={editSellerDialog} onOpenChange={setEditSellerDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Seller</DialogTitle>
+            <DialogDescription>Update seller information</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input 
+                type="text" 
+                id="name" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="store">Store Name</Label>
+              <Input 
+                type="text" 
+                id="store" 
+                name="store" 
+                value={formData.store} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => handleSelectChange('status', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="review">Under Review</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditSellerDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveSellerChanges}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Add Seller Dialog */}
+      <Dialog open={addSellerDialog} onOpenChange={setAddSellerDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Seller</DialogTitle>
+            <DialogDescription>Create a new seller account</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input 
+                type="text" 
+                id="name" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="store">Store Name</Label>
+              <Input 
+                type="text" 
+                id="store" 
+                name="store" 
+                value={formData.store} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => handleSelectChange('status', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="review">Under Review</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddSellerDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveNewSeller}>
+              Add Seller
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Product Dialog */}
+      <Dialog open={editProductDialog} onOpenChange={setEditProductDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Product</DialogTitle>
+            <DialogDescription>Update product information</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="name">Product Name</Label>
+              <Input 
+                type="text" 
+                id="name" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="price">Price (₹)</Label>
+              <Input 
+                type="text" 
+                id="price" 
+                name="price" 
+                value={formData.price} 
+                onChange={handleInputChange} 
+              />
+            </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => handleSelectChange('status', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="flagged">Flagged</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditProductDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveProductChanges}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Verification Dialog */}
+      <Dialog open={verificationDialog} onOpenChange={setVerificationDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Product Verification</DialogTitle>
+            <DialogDescription>Update product verification status</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="verificationStatus">Verification Status</Label>
+              <Select 
+                value={formData.verificationStatus} 
+                onValueChange={(value) => handleSelectChange('verificationStatus', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select verification status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Verified">Verified</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Unverified">Unverified</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setVerificationDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveVerificationStatus}>
+              Save Status
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Health Score Dialog */}
+      <Dialog open={healthScoreDialog} onOpenChange={setHealthScoreDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Product Health Score</DialogTitle>
+            <DialogDescription>Set the product health score (0-100)</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="healthScore">Health Score</Label>
+              <Input 
+                type="number" 
+                id="healthScore" 
+                name="healthScore" 
+                min="0"
+                max="100"
+                value={formData.healthScore} 
+                onChange={handleInputChange} 
+              />
+              
+              <div className="mt-2">
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                  <div 
+                    className={`h-2.5 rounded-full ${
+                      parseInt(formData.healthScore || '0') > 80 ? 'bg-green-500' :
+                      parseInt(formData.healthScore || '0') > 60 ? 'bg-yellow-500' : 'bg-red-500'
+                    }`}
+                    style={{ width: `${formData.healthScore || 0}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-red-500">Poor</span>
+                  <span className="text-yellow-500">Good</span>
+                  <span className="text-green-500">Excellent</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setHealthScoreDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveHealthScore}>
+              Save Score
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Condition Comparison Dialog */}
+      <Dialog open={conditionComparisonDialog} onOpenChange={setConditionComparisonDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Condition Comparison Tool</DialogTitle>
+            <DialogDescription>Compare condition with similar products</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <h4 className="text-sm font-medium mb-2">Product: {productToVerify?.name}</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Similar items found:</span>
+                  <span className="font-medium">12</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Condition rank:</span>
+                  <span className="font-medium">2 of 12</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Compared to average:</span>
+                  <span className="text-green-600 font-medium">Above average</span>
+                </div>
+              </div>
+            </div>
+            <div className="w-full bg-gray-100 p-4 rounded-lg">
+              <p className="text-sm text-gray-500 mb-2">Condition comparison</p>
+              <div className="relative h-10">
+                <div className="absolute bottom-0 left-0 w-8 h-6 bg-red-200 rounded"></div>
+                <div className="absolute bottom-0 left-10 w-8 h-7 bg-yellow-200 rounded"></div>
+                <div className="absolute bottom-0 left-20 w-8 h-8 bg-green-200 rounded"></div>
+                <div className="absolute bottom-0 left-30 w-8 h-10 bg-green-400 rounded">
+                  <div className="absolute -top-7 left-0 text-xs font-bold bg-green-600 text-white px-1 py-0.5 rounded">
+                    This item
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-40 w-8 h-5 bg-yellow-200 rounded"></div>
+                <div className="absolute bottom-0 left-50 w-8 h-3 bg-red-200 rounded"></div>
+              </div>
+              <div className="flex justify-between mt-2 text-xs text-gray-500">
+                <span>Poor</span>
+                <span>Average</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setConditionComparisonDialog(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminDashboard;
