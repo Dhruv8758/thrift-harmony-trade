@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -41,7 +40,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Define types for users, sellers and products
 interface User {
   id: string;
   name: string;
@@ -73,19 +71,16 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("users");
   
-  // State for data management
   const [users, setUsers] = useState<User[]>([]);
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   
-  // Dialog states
   const [editUserDialog, setEditUserDialog] = useState(false);
   const [editSellerDialog, setEditSellerDialog] = useState(false);
   const [editProductDialog, setEditProductDialog] = useState(false);
   const [addUserDialog, setAddUserDialog] = useState(false);
   const [addSellerDialog, setAddSellerDialog] = useState(false);
   
-  // Form states
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editingSeller, setEditingSeller] = useState<Seller | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -100,12 +95,10 @@ const AdminDashboard = () => {
   });
   
   useEffect(() => {
-    // Check if the user is logged in and is an admin
     const currentUser = localStorage.getItem("currentUser");
     if (currentUser) {
       const parsedUser = JSON.parse(currentUser);
       if (parsedUser.role !== "admin") {
-        // Redirect to sign in if not an admin
         toast({
           title: "Access denied",
           description: "You need admin privileges to access this page",
@@ -116,7 +109,6 @@ const AdminDashboard = () => {
       }
       setUser(parsedUser);
     } else {
-      // Redirect to sign in if not logged in
       toast({
         title: "Authentication required",
         description: "Please sign in to access admin dashboard",
@@ -125,20 +117,17 @@ const AdminDashboard = () => {
       navigate("/sign-in");
     }
     
-    // Load mock data
     loadMockData();
     setIsLoading(false);
   }, [navigate, toast]);
   
   const loadMockData = () => {
-    // Mock users data
     setUsers([
       { id: '1', name: 'John Doe', email: 'john@example.com', role: 'user', memberSince: 'March 2023' },
       { id: '2', name: 'Alice Smith', email: 'alice@example.com', role: 'user', memberSince: 'June 2023' },
       { id: '3', name: 'Bob Johnson', email: 'bob@example.com', role: 'user', memberSince: 'September 2023' }
     ]);
     
-    // Mock sellers data
     setSellers([
       { id: '1', name: 'SportsPro', store: 'Sports Equipment', products: 15, status: 'active' },
       { id: '2', name: 'ElectroGadgets', store: 'Electronics', products: 28, status: 'active' },
@@ -146,7 +135,6 @@ const AdminDashboard = () => {
       { id: '4', name: 'TechHub', store: 'Technology', products: 45, status: 'suspended' }
     ]);
     
-    // Mock products data
     setProducts([
       { id: '1', name: 'Professional Tennis Racket', seller: 'SportsPro', price: '₹12,000', status: 'active' },
       { id: '2', name: 'Mechanical Keyboard', seller: 'ElectroGadgets', price: '₹7,500', status: 'active' },
@@ -168,7 +156,6 @@ const AdminDashboard = () => {
     setActiveTab(value);
   };
   
-  // User management functions
   const handleEditUser = (user: User) => {
     setEditingUser(user);
     setFormData({
@@ -231,7 +218,6 @@ const AdminDashboard = () => {
     });
   };
   
-  // Seller management functions
   const handleEditSeller = (seller: Seller) => {
     setEditingSeller(seller);
     setFormData({
@@ -294,7 +280,6 @@ const AdminDashboard = () => {
     });
   };
   
-  // Product management functions
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setFormData({
@@ -336,26 +321,24 @@ const AdminDashboard = () => {
     });
   };
   
-  const handleProductAction = (product: Product, action: string) => {
+  const handleProductAction = (product: Product) => {
+    let updatedStatus: 'active' | 'pending' | 'flagged';
     let message = '';
-    let updatedProducts = [...products];
     
-    if (action === 'approve') {
-      updatedProducts = products.map(p => 
-        p.id === product.id ? { ...p, status: 'active' as 'active' } : p
-      );
-      message = 'Product has been approved and activated';
-    } else if (action === 'flag') {
-      updatedProducts = products.map(p => 
-        p.id === product.id ? { ...p, status: 'flagged' as 'flagged' } : p
-      );
+    if (product.status === 'active') {
+      updatedStatus = 'flagged';
       message = 'Product has been flagged for review';
-    } else if (action === 'activate') {
-      updatedProducts = products.map(p => 
-        p.id === product.id ? { ...p, status: 'active' as 'active' } : p
-      );
+    } else if (product.status === 'flagged') {
+      updatedStatus = 'active';
       message = 'Product has been activated';
+    } else if (product.status === 'pending') {
+      updatedStatus = 'active';
+      message = 'Product has been approved and activated';
     }
+    
+    const updatedProducts = products.map(p => 
+      p.id === product.id ? { ...p, status: updatedStatus } : p
+    );
     
     setProducts(updatedProducts);
     toast({
@@ -364,26 +347,24 @@ const AdminDashboard = () => {
     });
   };
   
-  const handleSellerAction = (seller: Seller, action: string) => {
+  const handleSellerAction = (seller: Seller) => {
+    let updatedStatus: 'active' | 'review' | 'suspended';
     let message = '';
-    let updatedSellers = [...sellers];
     
-    if (action === 'approve') {
-      updatedSellers = sellers.map(s => 
-        s.id === seller.id ? { ...s, status: 'active' as 'active' } : s
-      );
-      message = 'Seller has been approved';
-    } else if (action === 'suspend') {
-      updatedSellers = sellers.map(s => 
-        s.id === seller.id ? { ...s, status: 'suspended' as 'suspended' } : s
-      );
+    if (seller.status === 'active') {
+      updatedStatus = 'suspended';
       message = 'Seller has been suspended';
-    } else if (action === 'unsuspend') {
-      updatedSellers = sellers.map(s => 
-        s.id === seller.id ? { ...s, status: 'active' as 'active' } : s
-      );
+    } else if (seller.status === 'suspended') {
+      updatedStatus = 'active';
       message = 'Seller has been unsuspended and is now active';
+    } else if (seller.status === 'review') {
+      updatedStatus = 'active';
+      message = 'Seller has been approved';
     }
+    
+    const updatedSellers = sellers.map(s => 
+      s.id === seller.id ? { ...s, status: updatedStatus } : s
+    );
     
     setSellers(updatedSellers);
     toast({
@@ -392,7 +373,6 @@ const AdminDashboard = () => {
     });
   };
   
-  // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -435,7 +415,6 @@ const AdminDashboard = () => {
           </div>
           
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Sidebar */}
             <div className="md:w-1/4">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
                 <div className="flex flex-col items-center mb-6">
@@ -500,7 +479,6 @@ const AdminDashboard = () => {
               </div>
             </div>
             
-            {/* Main Content */}
             <div className="md:w-3/4">
               <Tabs value={activeTab} onValueChange={handleTabChange}>
                 <TabsList className="mb-6">
@@ -511,7 +489,6 @@ const AdminDashboard = () => {
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
                 
-                {/* Users Tab */}
                 <TabsContent value="users" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-4">Users Management</h3>
                   <div className="mb-4 flex justify-between items-center">
@@ -559,7 +536,6 @@ const AdminDashboard = () => {
                   </Table>
                 </TabsContent>
                 
-                {/* Sellers Tab */}
                 <TabsContent value="sellers" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-4">Sellers Management</h3>
                   <div className="mb-4 flex justify-between items-center">
@@ -605,41 +581,35 @@ const AdminDashboard = () => {
                                 Edit
                               </Button>
                               
-                              {seller.status === 'review' && (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="text-green-500" 
-                                  onClick={() => handleSellerAction(seller, 'approve')}
-                                >
-                                  <CheckCircle2 className="h-4 w-4 mr-1" />
-                                  Approve
-                                </Button>
-                              )}
-                              
-                              {seller.status === 'active' && (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="text-red-500" 
-                                  onClick={() => handleSellerAction(seller, 'suspend')}
-                                >
-                                  <AlertTriangle className="h-4 w-4 mr-1" />
-                                  Suspend
-                                </Button>
-                              )}
-                              
-                              {seller.status === 'suspended' && (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="text-green-500" 
-                                  onClick={() => handleSellerAction(seller, 'unsuspend')}
-                                >
-                                  <CheckCircle2 className="h-4 w-4 mr-1" />
-                                  Unsuspend
-                                </Button>
-                              )}
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className={
+                                  seller.status === 'active' ? "text-red-500" : 
+                                  seller.status === 'suspended' ? "text-green-500" : 
+                                  "text-green-500"
+                                }
+                                onClick={() => handleSellerAction(seller)}
+                              >
+                                {seller.status === 'active' && (
+                                  <>
+                                    <AlertTriangle className="h-4 w-4 mr-1" />
+                                    Suspend
+                                  </>
+                                )}
+                                {seller.status === 'suspended' && (
+                                  <>
+                                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                                    Unsuspend
+                                  </>
+                                )}
+                                {seller.status === 'review' && (
+                                  <>
+                                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                                    Approve
+                                  </>
+                                )}
+                              </Button>
                               
                               <Button 
                                 size="sm" 
@@ -658,7 +628,6 @@ const AdminDashboard = () => {
                   </Table>
                 </TabsContent>
                 
-                {/* Products Tab */}
                 <TabsContent value="products" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-4">Products Management</h3>
                   <div className="mb-4 flex justify-between items-center">
@@ -707,41 +676,35 @@ const AdminDashboard = () => {
                                 Edit
                               </Button>
                               
-                              {product.status === 'pending' && (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="text-green-500"
-                                  onClick={() => handleProductAction(product, 'approve')}
-                                >
-                                  <CheckCircle2 className="h-4 w-4 mr-1" />
-                                  Approve
-                                </Button>
-                              )}
-                              
-                              {product.status === 'active' && (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="text-yellow-500"
-                                  onClick={() => handleProductAction(product, 'flag')}
-                                >
-                                  <AlertTriangle className="h-4 w-4 mr-1" />
-                                  Flag
-                                </Button>
-                              )}
-                              
-                              {product.status === 'flagged' && (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="text-green-500"
-                                  onClick={() => handleProductAction(product, 'activate')}
-                                >
-                                  <CheckCircle2 className="h-4 w-4 mr-1" />
-                                  Activate
-                                </Button>
-                              )}
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className={
+                                  product.status === 'active' ? "text-yellow-500" : 
+                                  product.status === 'flagged' ? "text-green-500" : 
+                                  "text-green-500"
+                                }
+                                onClick={() => handleProductAction(product)}
+                              >
+                                {product.status === 'active' && (
+                                  <>
+                                    <AlertTriangle className="h-4 w-4 mr-1" />
+                                    Flag
+                                  </>
+                                )}
+                                {product.status === 'flagged' && (
+                                  <>
+                                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                                    Activate
+                                  </>
+                                )}
+                                {product.status === 'pending' && (
+                                  <>
+                                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                                    Approve
+                                  </>
+                                )}
+                              </Button>
                               
                               <Button 
                                 size="sm" 
@@ -760,7 +723,6 @@ const AdminDashboard = () => {
                   </Table>
                 </TabsContent>
                 
-                {/* Analytics Tab */}
                 <TabsContent value="analytics" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-4">Site Analytics</h3>
                   <div className="mb-6 text-gray-500">Platform performance metrics</div>
@@ -800,7 +762,6 @@ const AdminDashboard = () => {
                   </div>
                 </TabsContent>
                 
-                {/* Settings Tab */}
                 <TabsContent value="settings" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-4">Site Settings</h3>
                   <div className="space-y-6">
@@ -871,7 +832,6 @@ const AdminDashboard = () => {
       
       <Footer />
       
-      {/* User Edit Dialog */}
       <Dialog open={editUserDialog} onOpenChange={setEditUserDialog}>
         <DialogContent>
           <DialogHeader>
@@ -921,7 +881,6 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Add User Dialog */}
       <Dialog open={addUserDialog} onOpenChange={setAddUserDialog}>
         <DialogContent>
           <DialogHeader>
@@ -971,7 +930,6 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Seller Edit Dialog */}
       <Dialog open={editSellerDialog} onOpenChange={setEditSellerDialog}>
         <DialogContent>
           <DialogHeader>
@@ -1021,7 +979,6 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Add Seller Dialog */}
       <Dialog open={addSellerDialog} onOpenChange={setAddSellerDialog}>
         <DialogContent>
           <DialogHeader>
@@ -1071,7 +1028,6 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Product Edit Dialog */}
       <Dialog open={editProductDialog} onOpenChange={setEditProductDialog}>
         <DialogContent>
           <DialogHeader>
