@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,16 +15,46 @@ const SignIn = () => {
   const { signIn, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Check for remembered credentials on component mount
+  useEffect(() => {
+    // Check if user has chosen to be remembered
+    const rememberedLogin = localStorage.getItem("rememberedLogin");
+    if (rememberedLogin === "true") {
+      setRememberMe(true);
+      
+      // Get credentials from cookies
+      const getCookie = (name: string): string | null => {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+      };
+      
+      const rememberedEmail = getCookie("rememberedEmail");
+      if (rememberedEmail) {
+        setEmail(rememberedEmail);
+      }
+      
+      // We don't prefill the password for security reasons
+      // but we mark the checkbox as checked
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signIn(email, password);
+    await signIn(email, password, rememberMe);
   };
 
   const handleSocialLogin = (provider: string) => {
     // Mock social login by using a default email based on provider
     const socialEmail = provider === "GitHub" ? "user@github.com" : "user@google.com";
-    signIn(socialEmail, "password123");
+    signIn(socialEmail, "password123", rememberMe);
   };
 
   return (
@@ -85,7 +115,11 @@ const SignIn = () => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Checkbox id="remember" />
+              <Checkbox 
+                id="remember" 
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked === true)}
+              />
               <Label htmlFor="remember" className="text-sm font-normal">Remember me for 30 days</Label>
             </div>
             

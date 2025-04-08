@@ -18,7 +18,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signUp: (name: string, email: string, password: string, role: string) => Promise<void>;
   signOut: () => void;
 }
@@ -33,17 +33,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check local storage for existing user session
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-      try {
-        setUser(JSON.parse(currentUser));
-      } catch (error) {
-        console.error("Failed to parse user from localStorage:", error);
-        localStorage.removeItem('currentUser');
+    // Check for session in cookies first, then localStorage as fallback
+    const rememberedEmail = getCookie("rememberedEmail");
+    const rememberedPassword = getCookie("rememberedPassword");
+    
+    if (rememberedEmail && rememberedPassword) {
+      // Auto sign in if credentials are found in cookies
+      signIn(rememberedEmail, rememberedPassword, true);
+    } else {
+      // Check local storage for existing user session
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        try {
+          setUser(JSON.parse(currentUser));
+        } catch (error) {
+          console.error("Failed to parse user from localStorage:", error);
+          localStorage.removeItem('currentUser');
+        }
       }
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   // Check if user credentials are valid
@@ -53,8 +62,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return email.includes('@') && password.length >= 6;
   }
 
+  // Helper functions for cookie management
+  const setCookie = (name: string, value: string, days: number = 30) => {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "; expires=" + date.toUTCString();
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  };
+
+  const getCookie = (name: string): string | null => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  };
+
+  const eraseCookie = (name: string) => {
+    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  };
+
   // Sign in function
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = false) => {
     setIsLoading(true);
     try {
       // Check if credentials are valid
@@ -85,6 +117,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Store user in localStorage
       localStorage.setItem("currentUser", JSON.stringify(user));
+
+      // If remember me is checked, store credentials in cookies
+      if (rememberMe) {
+        setCookie("rememberedEmail", email);
+        setCookie("rememberedPassword", password);
+        localStorage.setItem("rememberedLogin", "true");
+      }
+      
       setUser(user);
       
       toast({
@@ -160,6 +200,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
       
       localStorage.setItem("currentUser", JSON.stringify(user));
+      // Store credentials by default for new users
+      setCookie("rememberedEmail", email);
+      setCookie("rememberedPassword", password);
+      localStorage.setItem("rememberedLogin", "true");
+      
       setUser(user);
       
       toast({
@@ -188,7 +233,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Sign out function
   const signOut = () => {
+    // Clear all stored authentication data
     localStorage.removeItem("currentUser");
+    eraseCookie("rememberedEmail");
+    eraseCookie("rememberedPassword");
+    localStorage.removeItem("rememberedLogin");
+    
     setUser(null);
     toast({
       title: "Signed out",
