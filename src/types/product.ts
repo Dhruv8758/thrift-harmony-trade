@@ -11,4 +11,11 @@ export type Product = {
   };
   category: string;
   description?: string;
+  verificationStatus?: "Verified" | "Pending" | "Unverified";
+  healthScore?: number;
+  conditionComparison?: {
+    similarItems: number;
+    conditionRank: number;
+    aboveAverage: boolean;
+  };
 };

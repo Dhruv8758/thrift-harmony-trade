@@ -14,12 +14,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   const { toast } = useToast();
   const location = useLocation();
   
-  // Show loading state
+  // Show uniquely styled loading state with animation
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="w-10 h-10 border-t-2 border-scrapeGenie-600 border-solid rounded-full animate-spin mx-auto"></div>
-        <p className="ml-2">Loading...</p>
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div className="relative">
+          <div className="w-16 h-16 border-t-4 border-b-4 border-scrapeGenie-600 rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-r-4 border-l-4 border-scrapeGenie-400 rounded-full animate-spin absolute top-2 left-2 animation-delay-150"></div>
+          <div className="w-8 h-8 border-t-4 border-b-4 border-scrapeGenie-200 rounded-full animate-spin absolute top-4 left-4 animation-delay-300"></div>
+        </div>
+        <p className="mt-4 text-lg font-medium text-scrapeGenie-600">Authenticating...</p>
+        <p className="text-sm text-gray-500">Verifying your credentials</p>
       </div>
     );
   }

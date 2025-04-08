@@ -17,7 +17,10 @@ import {
   Eye,
   AlertTriangle,
   CheckCircle2,
-  X
+  X,
+  Award,
+  Thermometer,
+  BarChart2
 } from "lucide-react";
 import { 
   Dialog,
@@ -39,6 +42,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface User {
   id: string;
@@ -62,6 +66,8 @@ interface Product {
   seller: string;
   price: string;
   status: 'active' | 'pending' | 'flagged';
+  verificationStatus?: 'Verified' | 'Pending' | 'Unverified';
+  healthScore?: number;
 }
 
 const AdminDashboard = () => {
@@ -136,10 +142,42 @@ const AdminDashboard = () => {
     ]);
     
     setProducts([
-      { id: '1', name: 'Professional Tennis Racket', seller: 'SportsPro', price: '₹12,000', status: 'active' },
-      { id: '2', name: 'Mechanical Keyboard', seller: 'ElectroGadgets', price: '₹7,500', status: 'active' },
-      { id: '3', name: 'Handmade Ceramic Vase', seller: 'HomeDecor', price: '₹3,750', status: 'pending' },
-      { id: '4', name: 'Gaming Mouse', seller: 'TechHub', price: '₹4,500', status: 'flagged' }
+      { 
+        id: '1', 
+        name: 'Professional Tennis Racket', 
+        seller: 'SportsPro', 
+        price: '₹12,000', 
+        status: 'active',
+        verificationStatus: 'Verified',
+        healthScore: 92
+      },
+      { 
+        id: '2', 
+        name: 'Mechanical Keyboard', 
+        seller: 'ElectroGadgets', 
+        price: '₹7,500', 
+        status: 'active',
+        verificationStatus: 'Pending',
+        healthScore: 87
+      },
+      { 
+        id: '3', 
+        name: 'Handmade Ceramic Vase', 
+        seller: 'HomeDecor', 
+        price: '₹3,750', 
+        status: 'pending',
+        verificationStatus: 'Unverified',
+        healthScore: 75
+      },
+      { 
+        id: '4', 
+        name: 'Gaming Mouse', 
+        seller: 'TechHub', 
+        price: '₹4,500', 
+        status: 'flagged',
+        verificationStatus: 'Pending',
+        healthScore: 60
+      }
     ]);
   };
 
@@ -321,6 +359,59 @@ const AdminDashboard = () => {
     });
   };
   
+  const handleVerifyProduct = (product: Product) => {
+    setProductToVerify(product);
+    setVerificationDialog(true);
+  };
+  
+  const saveVerificationStatus = () => {
+    if (!productToVerify) return;
+    
+    const updatedProducts = products.map(p => 
+      p.id === productToVerify.id 
+        ? { ...p, verificationStatus: formData.verificationStatus as 'Verified' | 'Pending' | 'Unverified' }
+        : p
+    );
+    
+    setProducts(updatedProducts);
+    setVerificationDialog(false);
+    toast({
+      title: "Verification status updated",
+      description: `Product has been marked as ${formData.verificationStatus}`
+    });
+  };
+  
+  const handleHealthScore = (product: Product) => {
+    setProductToVerify(product);
+    setFormData({
+      ...formData,
+      healthScore: product.healthScore?.toString() || '0'
+    });
+    setHealthScoreDialog(true);
+  };
+  
+  const saveHealthScore = () => {
+    if (!productToVerify) return;
+    
+    const updatedProducts = products.map(p => 
+      p.id === productToVerify.id 
+        ? { ...p, healthScore: parseInt(formData.healthScore || '0') }
+        : p
+    );
+    
+    setProducts(updatedProducts);
+    setHealthScoreDialog(false);
+    toast({
+      title: "Health score updated",
+      description: `Product health score set to ${formData.healthScore}`
+    });
+  };
+  
+  const handleConditionComparison = (product: Product) => {
+    setProductToVerify(product);
+    setConditionComparisonDialog(true);
+  };
+  
   const handleProductAction = (product: Product) => {
     let updatedStatus: 'active' | 'pending' | 'flagged';
     let message = '';
@@ -387,6 +478,12 @@ const AdminDashboard = () => {
       [name]: value
     });
   };
+
+  // Add new state for verification dialog
+  const [verificationDialog, setVerificationDialog] = useState(false);
+  const [productToVerify, setProductToVerify] = useState<Product | null>(null);
+  const [healthScoreDialog, setHealthScoreDialog] = useState(false);
+  const [conditionComparisonDialog, setConditionComparisonDialog] = useState(false);
 
   if (isLoading || !user) {
     return (
@@ -638,6 +735,43 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                   
+                  {/* Unique Features Banner */}
+                  <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-blue-100">
+                    <h4 className="font-medium text-blue-800 flex items-center">
+                      <Award className="h-5 w-5 mr-2" />
+                      Unique ScrapeGenie Features
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                          <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Authenticity Verification</p>
+                          <p className="text-xs text-gray-500">Verify product authenticity</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                          <Thermometer className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Product Health Score</p>
+                          <p className="text-xs text-gray-500">Rate overall product condition</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                          <BarChart2 className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Condition Comparison</p>
+                          <p className="text-xs text-gray-500">Compare with similar items</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -645,6 +779,8 @@ const AdminDashboard = () => {
                         <TableHead>Seller</TableHead>
                         <TableHead>Price</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Verification</TableHead>
+                        <TableHead>Health</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -656,14 +792,37 @@ const AdminDashboard = () => {
                           <TableCell>{product.price}</TableCell>
                           <TableCell>
                             {product.status === 'active' && (
-                              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Active</span>
+                              <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>
                             )}
                             {product.status === 'pending' && (
-                              <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Pending</span>
+                              <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>
                             )}
                             {product.status === 'flagged' && (
-                              <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Flagged</span>
+                              <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Flagged</Badge>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            {product.verificationStatus === 'Verified' && (
+                              <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100 flex items-center">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                Verified
+                              </Badge>
+                            )}
+                            {product.verificationStatus === 'Pending' && (
+                              <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>
+                            )}
+                            {product.verificationStatus === 'Unverified' && (
+                              <Badge variant="outline" className="bg-gray-100 text-gray-800 hover:bg-gray-100">Unverified</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center">
+                              <div className={`w-8 h-2 rounded-full mr-2 ${
+                                (product.healthScore || 0) > 80 ? 'bg-green-500' :
+                                (product.healthScore || 0) > 60 ? 'bg-yellow-500' : 'bg-red-500'
+                              }`}></div>
+                              <span>{product.healthScore || 0}</span>
+                            </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
@@ -706,15 +865,37 @@ const AdminDashboard = () => {
                                 )}
                               </Button>
                               
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="text-red-500"
-                                onClick={() => handleDeleteProduct(product.id)}
-                              >
-                                <Trash2 className="h-4 w-4 mr-1" />
-                                Delete
-                              </Button>
+                              <div className="flex space-x-1">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="text-green-600"
+                                  onClick={() => handleVerifyProduct(product)}
+                                  title="Verify product authenticity"
+                                >
+                                  <CheckCircle2 className="h-4 w-4" />
+                                </Button>
+                                
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="text-blue-600"
+                                  onClick={() => handleHealthScore(product)}
+                                  title="Set product health score"
+                                >
+                                  <Thermometer className="h-4 w-4" />
+                                </Button>
+                                
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="text-purple-600"
+                                  onClick={() => handleConditionComparison(product)}
+                                  title="Condition comparison tool"
+                                >
+                                  <BarChart2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -729,355 +910,3 @@ const AdminDashboard = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div className="bg-gray-50 p-4 rounded-lg border">
-                      <h4 className="text-gray-500 text-sm mb-1">Total Users</h4>
-                      <div className="text-2xl font-bold">1,245</div>
-                      <div className="text-green-500 text-sm">+12% from last month</div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg border">
-                      <h4 className="text-gray-500 text-sm mb-1">Active Sellers</h4>
-                      <div className="text-2xl font-bold">126</div>
-                      <div className="text-green-500 text-sm">+8% from last month</div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg border">
-                      <h4 className="text-gray-500 text-sm mb-1">Total Products</h4>
-                      <div className="text-2xl font-bold">3,890</div>
-                      <div className="text-green-500 text-sm">+15% from last month</div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg border">
-                      <h4 className="text-gray-500 text-sm mb-1">Total Orders</h4>
-                      <div className="text-2xl font-bold">952</div>
-                      <div className="text-green-500 text-sm">+10% from last month</div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <Button className="mb-4">Generate Reports</Button>
-                    <div className="h-64 bg-gray-100 rounded-lg border flex items-center justify-center mb-6">
-                      <p className="text-gray-500">User growth chart will appear here</p>
-                    </div>
-                    <Button className="mb-4">Export Data</Button>
-                    <div className="h-64 bg-gray-100 rounded-lg border flex items-center justify-center">
-                      <p className="text-gray-500">Revenue chart will appear here</p>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="settings" className="bg-white p-6 rounded-lg shadow-sm border">
-                  <h3 className="text-xl font-semibold mb-4">Site Settings</h3>
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="font-medium mb-2">General Settings</h4>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
-                          <input type="text" className="w-full p-2 border rounded-md" defaultValue="ScrapeGenie" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Site Description</label>
-                          <textarea 
-                            className="w-full p-2 border rounded-md" 
-                            rows={3}
-                            defaultValue="Marketplace for buying and selling products."
-                          />
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input type="checkbox" id="maintenance" />
-                          <label htmlFor="maintenance" className="text-sm font-medium text-gray-700">Maintenance Mode</label>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">Email Settings</h4>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">SMTP Server</label>
-                          <input type="text" className="w-full p-2 border rounded-md" placeholder="smtp.example.com" />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">SMTP Username</label>
-                            <input type="text" className="w-full p-2 border rounded-md" placeholder="username" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">SMTP Password</label>
-                            <input type="password" className="w-full p-2 border rounded-md" placeholder="••••••••" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">Security Settings</h4>
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                          <input type="checkbox" id="twoFactor" />
-                          <label htmlFor="twoFactor" className="text-sm font-medium text-gray-700">Require Two-Factor Authentication for Admins</label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input type="checkbox" id="captcha" />
-                          <label htmlFor="captcha" className="text-sm font-medium text-gray-700">Enable CAPTCHA on Forms</label>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <Button className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700">Save Settings</Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </div>
-      </main>
-      
-      <Footer />
-      
-      <Dialog open={editUserDialog} onOpenChange={setEditUserDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Make changes to user information.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input 
-                id="name" 
-                name="name"
-                value={formData.name} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                name="email"
-                value={formData.email} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value) => handleSelectChange("role", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="seller">Seller</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditUserDialog(false)}>Cancel</Button>
-            <Button onClick={saveUserChanges}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={addUserDialog} onOpenChange={setAddUserDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
-            <DialogDescription>Enter user information.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input 
-                id="name" 
-                name="name"
-                value={formData.name} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                name="email"
-                value={formData.email} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value) => handleSelectChange("role", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="seller">Seller</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddUserDialog(false)}>Cancel</Button>
-            <Button onClick={saveNewUser}>Add User</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={editSellerDialog} onOpenChange={setEditSellerDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Seller</DialogTitle>
-            <DialogDescription>Make changes to seller information.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input 
-                id="name" 
-                name="name"
-                value={formData.name} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="store">Store</Label>
-              <Input 
-                id="store" 
-                name="store"
-                value={formData.store} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => handleSelectChange("status", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditSellerDialog(false)}>Cancel</Button>
-            <Button onClick={saveSellerChanges}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={addSellerDialog} onOpenChange={setAddSellerDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Seller</DialogTitle>
-            <DialogDescription>Enter seller information.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input 
-                id="name" 
-                name="name"
-                value={formData.name} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="store">Store</Label>
-              <Input 
-                id="store" 
-                name="store"
-                value={formData.store} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => handleSelectChange("status", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddSellerDialog(false)}>Cancel</Button>
-            <Button onClick={saveNewSeller}>Add Seller</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={editProductDialog} onOpenChange={setEditProductDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
-            <DialogDescription>Make changes to product information.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Product Name</Label>
-              <Input 
-                id="name" 
-                name="name"
-                value={formData.name} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="price">Price (₹)</Label>
-              <Input 
-                id="price" 
-                name="price"
-                value={formData.price} 
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => handleSelectChange("status", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="flagged">Flagged</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditProductDialog(false)}>Cancel</Button>
-            <Button onClick={saveProductChanges}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-export default AdminDashboard;
