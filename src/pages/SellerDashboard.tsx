@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -916,4 +917,411 @@ const SellerDashboard = () => {
                                   <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Delivered</Badge>
                                 )}
                                 {order.status === 'cancelled' && (
-                                  <Badge variant="outline" className="bg-red-100 text-red-800 hover:
+                                  <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Cancelled</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleUpdateOrderStatus(order)}
+                                >
+                                  Update Status
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </TabsContent>
+
+                {/* Payments Tab */}
+                <TabsContent value="payments" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-6">Payments</h3>
+                  
+                  {payments.length === 0 ? (
+                    <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
+                      <DollarSign className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                      <h4 className="text-lg font-medium text-gray-900 mb-1">No payments yet</h4>
+                      <p className="text-gray-500">Payments will appear here when orders are completed</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Payment ID</TableHead>
+                            <TableHead>Amount</TableHead>
+                            <TableHead>From</TableHead>
+                            <TableHead>For</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {payments.map(payment => (
+                            <TableRow key={payment.id}>
+                              <TableCell className="font-medium">{payment.id}</TableCell>
+                              <TableCell>{payment.amount}</TableCell>
+                              <TableCell>{payment.from}</TableCell>
+                              <TableCell>{payment.for}</TableCell>
+                              <TableCell>{payment.date}</TableCell>
+                              <TableCell>
+                                {payment.status === 'completed' && (
+                                  <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>
+                                )}
+                                {payment.status === 'pending' && (
+                                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>
+                                )}
+                                {payment.status === 'failed' && (
+                                  <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Failed</Badge>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </TabsContent>
+
+                {/* Messages Tab */}
+                <TabsContent value="messages" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-6">Messages</h3>
+                  
+                  {messages.length === 0 ? (
+                    <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
+                      <MessageSquare className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                      <h4 className="text-lg font-medium text-gray-900 mb-1">No messages yet</h4>
+                      <p className="text-gray-500">Messages from customers will appear here</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>From</TableHead>
+                            <TableHead>Message</TableHead>
+                            <TableHead>Product</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {messages.map(message => (
+                            <TableRow key={message.id} className={!message.read ? "bg-blue-50" : ""}>
+                              <TableCell>
+                                <div className="flex items-center">
+                                  <div className="h-8 w-8 rounded-full bg-scrapeGenie-100 flex items-center justify-center mr-2 text-sm font-medium">
+                                    {message.avatar}
+                                  </div>
+                                  <span>{message.from}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="max-w-xs truncate">{message.content}</TableCell>
+                              <TableCell>{message.productTitle || 'N/A'}</TableCell>
+                              <TableCell>{message.timestamp}</TableCell>
+                              <TableCell>
+                                {message.read ? (
+                                  <Badge variant="outline" className="bg-gray-100 text-gray-800">Read</Badge>
+                                ) : (
+                                  <Badge variant="outline" className="bg-blue-100 text-blue-800">New</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleViewMessage(message)}
+                                >
+                                  View & Reply
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+
+                  {/* Message View/Reply Dialog */}
+                  {currentMessage && (
+                    <Dialog open={!!currentMessage} onOpenChange={() => setCurrentMessage(null)}>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Message from {currentMessage.from}</DialogTitle>
+                          <DialogDescription>
+                            {currentMessage.productTitle && `About: ${currentMessage.productTitle}`}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="p-4 bg-gray-50 rounded-md">
+                            <div className="flex items-center mb-2">
+                              <div className="h-8 w-8 rounded-full bg-scrapeGenie-100 flex items-center justify-center mr-2 text-sm font-medium">
+                                {currentMessage.avatar}
+                              </div>
+                              <span className="font-medium">{currentMessage.from}</span>
+                              <span className="ml-auto text-xs text-gray-500">{currentMessage.timestamp}</span>
+                            </div>
+                            <p>{currentMessage.content}</p>
+                          </div>
+                          <div>
+                            <Label htmlFor="reply">Your Reply</Label>
+                            <Textarea 
+                              id="reply"
+                              placeholder="Type your reply here..."
+                              value={replyText}
+                              onChange={e => setReplyText(e.target.value)}
+                              className="mt-1"
+                              rows={4}
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button type="button" variant="outline" onClick={() => setCurrentMessage(null)}>
+                            Cancel
+                          </Button>
+                          <Button 
+                            type="button" 
+                            onClick={handleSendReply} 
+                            disabled={!replyText.trim()}
+                          >
+                            Send Reply
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </TabsContent>
+
+                {/* Analytics Tab */}
+                <TabsContent value="analytics" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-6">Analytics</h3>
+                  <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
+                    <BarChart className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                    <h4 className="text-lg font-medium text-gray-900 mb-1">Analytics Coming Soon</h4>
+                    <p className="text-gray-500">Detailed analytics for your seller account will be available soon</p>
+                  </div>
+                </TabsContent>
+
+                {/* Settings Tab */}
+                <TabsContent value="settings" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-6">Settings</h3>
+                  <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
+                    <Settings className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                    <h4 className="text-lg font-medium text-gray-900 mb-1">Settings Coming Soon</h4>
+                    <p className="text-gray-500">Account settings will be available soon</p>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+
+        {/* Product Form Dialog */}
+        <Dialog open={productDialog} onOpenChange={setProductDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{currentProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+              <DialogDescription>
+                {currentProduct ? 'Update your product details' : 'Add a new product to your listings'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="title">Product Title</Label>
+                <Input
+                  id="title"
+                  value={productForm.title}
+                  onChange={(e) => handleProductFormChange('title', e.target.value)}
+                  placeholder="Enter product title"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="price">Price (₹)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  value={productForm.price}
+                  onChange={(e) => handleProductFormChange('price', e.target.value)}
+                  placeholder="Enter price"
+                  min={0}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="condition">Condition</Label>
+                <Select
+                  value={productForm.condition}
+                  onValueChange={(value) => handleProductFormChange('condition', value)}
+                >
+                  <SelectTrigger id="condition">
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="New">New</SelectItem>
+                    <SelectItem value="Like New">Like New</SelectItem>
+                    <SelectItem value="Good">Good</SelectItem>
+                    <SelectItem value="Fair">Fair</SelectItem>
+                    <SelectItem value="Poor">Poor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="category">Category</Label>
+                <Input
+                  id="category"
+                  value={productForm.category}
+                  onChange={(e) => handleProductFormChange('category', e.target.value)}
+                  placeholder="Enter category"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={productForm.description}
+                  onChange={(e) => handleProductFormChange('description', e.target.value)}
+                  placeholder="Enter product description"
+                  rows={4}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="status">Listing Status</Label>
+                <Select
+                  value={productForm.statusText}
+                  onValueChange={(value) => handleProductFormChange('statusText', value)}
+                >
+                  <SelectTrigger id="status">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Draft">Draft</SelectItem>
+                    <SelectItem value="Pending Review">Pending Review</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setProductDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={saveProduct}>
+                {currentProduct ? 'Update Product' : 'Add Product'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Product Confirmation Dialog */}
+        <Dialog open={deleteProductDialog} onOpenChange={setDeleteProductDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Delete Product</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this product? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {currentProduct && (
+                <div className="flex items-center space-x-3 bg-gray-50 p-3 rounded-md">
+                  <div className="h-12 w-12 bg-gray-100 rounded-md overflow-hidden">
+                    <img 
+                      src={currentProduct.image || '/placeholder.svg'} 
+                      alt={currentProduct.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-medium">{currentProduct.title}</p>
+                    <p className="text-sm text-gray-500">₹{currentProduct.price.toLocaleString()}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteProductDialog(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDeleteProduct}>
+                Delete Product
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Order Status Update Dialog */}
+        <Dialog open={orderStatusDialog} onOpenChange={setOrderStatusDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Update Order Status</DialogTitle>
+              <DialogDescription>
+                Change the status of this order
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {currentOrder && (
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-3 rounded-md">
+                    <p><strong>Order ID:</strong> {currentOrder.id}</p>
+                    <p><strong>Product:</strong> {currentOrder.product}</p>
+                    <p><strong>Customer:</strong> {currentOrder.customer}</p>
+                    <p><strong>Amount:</strong> {currentOrder.price}</p>
+                    <p><strong>Current Status:</strong> {currentOrder.status}</p>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="status">New Status</Label>
+                    <div className="flex flex-col space-y-2">
+                      <Button 
+                        variant={currentOrder.status === 'pending' ? 'default' : 'outline'}
+                        onClick={() => updateOrderStatus('pending')}
+                      >
+                        Pending
+                      </Button>
+                      <Button 
+                        variant={currentOrder.status === 'processing' ? 'default' : 'outline'}
+                        onClick={() => updateOrderStatus('processing')}
+                      >
+                        Processing
+                      </Button>
+                      <Button 
+                        variant={currentOrder.status === 'shipped' ? 'default' : 'outline'}
+                        onClick={() => updateOrderStatus('shipped')}
+                      >
+                        Shipped
+                      </Button>
+                      <Button 
+                        variant={currentOrder.status === 'delivered' ? 'default' : 'outline'}
+                        onClick={() => updateOrderStatus('delivered')}
+                      >
+                        Delivered
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="text-red-500 hover:bg-red-50"
+                        onClick={() => updateOrderStatus('cancelled')}
+                      >
+                        Cancel Order
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOrderStatusDialog(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default SellerDashboard;
