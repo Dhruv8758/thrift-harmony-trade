@@ -2,9 +2,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
+import { broadcastEvent, subscribeToEvent } from "@/utils/realTimeUtils";
 
 // Define user interface
 interface User {
+  id?: string;
   name: string;
   email: string;
   phone?: string;
@@ -54,10 +56,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     }
 
+    // Subscribe to real-time user events
+    const unsubscribeAuthUpdate = subscribeToEvent<User | null>("authUpdate", (updatedUser) => {
+      if (updatedUser) {
+        setUser(updatedUser);
+        toast({
+          title: "Session updated",
+          description: `You are now signed in as ${updatedUser.name}`,
+        });
+      } else {
+        setUser(null);
+        toast({
+          title: "Session ended",
+          description: "You have been signed out",
+        });
+        navigate("/sign-in");
+      }
+    });
+    
     // Add event listener for real-time auth state sync across tabs
     window.addEventListener('storage', handleStorageChange);
+    
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      unsubscribeAuthUpdate();
     };
   }, []);
 
@@ -138,8 +160,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Simulate API call with timeout
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Create the user object from existing data
+      // Create the user object from existing data with an ID
       const user = {
+        id: existingUser.id || email.replace(/[^a-zA-Z0-9]/g, ''),
         name: existingUser.name,
         email: existingUser.email,
         phone: existingUser.phone || "",
@@ -159,6 +182,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       setUser(user);
+      
+      // Broadcast login event to other tabs/windows
+      broadcastEvent("authUpdate", user);
       
       toast({
         title: "Sign in successful",
@@ -204,8 +230,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Simulate API call with timeout
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Generate a unique ID for the new user
+      const userId = email.replace(/[^a-zA-Z0-9]/g, '');
+      
       // Create user object
       const newUser = {
+        id: userId,
         name: name,
         email: email,
         password: password, // In a real app, this would be hashed
@@ -224,6 +254,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Auto sign-in the new user
       const user = {
+        id: userId,
         name: newUser.name,
         email: newUser.email,
         phone: newUser.phone,
@@ -239,6 +270,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem("rememberedLogin", "true");
       
       setUser(user);
+      
+      // Broadcast login event to other tabs/windows
+      broadcastEvent("authUpdate", user);
       
       toast({
         title: "Account created successfully",
@@ -273,6 +307,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("rememberedLogin");
     
     setUser(null);
+    
+    // Broadcast logout event to other tabs/windows
+    broadcastEvent("authUpdate", null);
+    
     toast({
       title: "Signed out",
       description: "You have been signed out successfully",

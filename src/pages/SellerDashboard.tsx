@@ -45,25 +45,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Product } from "@/types/product";
-
-// Define interfaces for seller dashboard
-interface Message {
-  id: string;
-  from: string;
-  avatar: string;
-  content: string;
-  timestamp: string;
-  read: boolean;
-}
-
-interface Order {
-  id: string;
-  product: string;
-  customer: string;
-  price: string;
-  status: 'pending' | 'shipped' | 'delivered' | 'cancelled';
-  date: string;
-}
+import { 
+  getUserMessages, 
+  getUserOrders, 
+  updateOrder, 
+  subscribeToEvent, 
+  getCurrentUser 
+} from "@/utils/realTimeUtils";
+import { Message, Order } from "@/utils/realTimeUtils";
 
 interface Payment {
   id: string;
@@ -133,6 +122,50 @@ const SellerDashboard = () => {
         return;
       }
       setUser(parsedUser);
+      
+      // Load real messages for this seller
+      const userMessages = getUserMessages(parsedUser.id || parsedUser.email);
+      const formattedMessages = userMessages.map(msg => ({
+        id: msg.id,
+        from: msg.from.name,
+        avatar: msg.from.avatar,
+        content: msg.content,
+        timestamp: new Date(msg.timestamp).toLocaleString(),
+        read: msg.read,
+        productId: msg.productId,
+        productTitle: msg.productTitle
+      }));
+      setMessages(formattedMessages);
+      
+      // Load real orders for this seller
+      const userOrders = getUserOrders(parsedUser.id || parsedUser.email, 'seller');
+      setOrders(userOrders.map(order => ({
+        id: order.id,
+        product: order.productName,
+        customer: order.buyerName,
+        price: `₹${order.price.toLocaleString()}`,
+        status: order.status,
+        date: new Date(order.date).toLocaleDateString()
+      })));
+      
+      // Generate payments based on orders
+      const generatedPayments = userOrders
+        .filter(order => order.status === 'delivered')
+        .map(order => ({
+          id: `PAY-${order.id.split('_')[1]}`,
+          amount: `₹${order.price.toLocaleString()}`,
+          from: order.buyerName,
+          for: order.productName,
+          date: new Date(order.date).toLocaleDateString(),
+          status: 'completed' as 'completed' | 'pending' | 'failed'
+        }));
+        
+      if (generatedPayments.length > 0) {
+        setPayments(generatedPayments);
+      } else {
+        // Load mock payments if no real ones exist
+        loadMockPayments();
+      }
     } else {
       // Redirect to sign in if not logged in
       toast({
@@ -143,12 +176,110 @@ const SellerDashboard = () => {
       navigate("/sign-in");
     }
 
-    // Load mock data
-    loadMockData();
+    // Load mock data for products
+    loadMockProducts();
     setIsLoading(false);
+    
+    // Subscribe to real-time updates
+    const unsubscribeNewMessage = subscribeToEvent<Message>("newMessage", handleNewMessage);
+    const unsubscribeNewOrder = subscribeToEvent<Order>("newOrder", handleNewOrder);
+    const unsubscribeOrderUpdated = subscribeToEvent<Order>("orderUpdated", handleOrderUpdated);
+    
+    return () => {
+      unsubscribeNewMessage();
+      unsubscribeNewOrder();
+      unsubscribeOrderUpdated();
+    };
   }, [navigate, toast]);
 
-  const loadMockData = () => {
+  // Real-time event handlers
+  const handleNewMessage = (message: Message) => {
+    if (!user) return;
+    
+    // Check if this message is for the current user
+    if (message.to.id === (user.id || user.email)) {
+      const formattedMessage = {
+        id: message.id,
+        from: message.from.name,
+        avatar: message.from.avatar,
+        content: message.content,
+        timestamp: new Date(message.timestamp).toLocaleString(),
+        read: false,
+        productId: message.productId,
+        productTitle: message.productTitle
+      };
+      
+      setMessages(prevMessages => [formattedMessage, ...prevMessages]);
+      
+      toast({
+        title: "New message received",
+        description: `You have a new message from ${message.from.name}`,
+      });
+    }
+  };
+  
+  const handleNewOrder = (order: Order) => {
+    if (!user) return;
+    
+    // Check if this order is for the current user as a seller
+    if (order.sellerId === (user.id || user.email)) {
+      const formattedOrder = {
+        id: order.id,
+        product: order.productName,
+        customer: order.buyerName,
+        price: `₹${order.price.toLocaleString()}`,
+        status: order.status,
+        date: new Date(order.date).toLocaleDateString()
+      };
+      
+      setOrders(prevOrders => [formattedOrder, ...prevOrders]);
+      
+      toast({
+        title: "New order received",
+        description: `You have received a new order for ${order.productName}`,
+      });
+    }
+  };
+  
+  const handleOrderUpdated = (order: Order) => {
+    if (!user) return;
+    
+    // Check if this order is for the current user as a seller
+    if (order.sellerId === (user.id || user.email)) {
+      setOrders(prevOrders => 
+        prevOrders.map(prevOrder => 
+          prevOrder.id === order.id 
+            ? {
+                ...prevOrder,
+                status: order.status,
+                // Update any other fields that might have changed
+              }
+            : prevOrder
+        )
+      );
+      
+      toast({
+        title: "Order updated",
+        description: `Order status for ${order.productName} has been updated to ${order.status}`,
+      });
+      
+      // If order is delivered, add a payment
+      if (order.status === 'delivered') {
+        const newPayment = {
+          id: `PAY-${order.id.split('_')[1]}`,
+          amount: `₹${order.price.toLocaleString()}`,
+          from: order.buyerName,
+          for: order.productName,
+          date: new Date(order.date).toLocaleDateString(),
+          status: 'completed' as 'completed' | 'pending' | 'failed'
+        };
+        
+        setPayments(prevPayments => [newPayment, ...prevPayments]);
+      }
+    }
+  };
+
+  const loadMockProducts = () => {
     // Mock products
     const mockProducts: SellerProduct[] = [
       {
@@ -211,63 +342,9 @@ const SellerDashboard = () => {
     ];
     
     setProducts(mockProducts);
-    
-    // Mock messages
-    setMessages([
-      {
-        id: '1', 
-        from: 'John Doe',
-        avatar: 'JD',
-        content: 'Is the tennis racket still available? I\'m interested in purchasing it.',
-        timestamp: 'Today, 10:35 AM',
-        read: false
-      },
-      {
-        id: '2', 
-        from: 'Alice Smith',
-        avatar: 'AS',
-        content: 'Do you offer international shipping for the Dutch Oven?',
-        timestamp: 'Yesterday, 4:20 PM',
-        read: true
-      },
-      {
-        id: '3', 
-        from: 'Robert Johnson',
-        avatar: 'RJ',
-        content: 'Thanks for the quick delivery of the drone! Works perfectly.',
-        timestamp: '2 days ago',
-        read: true
-      }
-    ]);
-    
-    // Mock orders
-    setOrders([
-      {
-        id: 'ORD-1001',
-        product: 'Professional Tennis Racket',
-        customer: 'Amit Patel',
-        price: '₹12,000',
-        status: 'pending',
-        date: 'Today'
-      },
-      {
-        id: 'ORD-1002',
-        product: 'Cast Iron Dutch Oven',
-        customer: 'Priya Sharma',
-        price: '₹3,500',
-        status: 'shipped',
-        date: 'Yesterday'
-      },
-      {
-        id: 'ORD-998',
-        product: 'Wireless Bluetooth Headphones',
-        customer: 'Rahul Verma',
-        price: '₹4,200',
-        status: 'delivered',
-        date: 'Mar 25, 2024'
-      }
-    ]);
-    
+  };
+  
+  const loadMockPayments = () => {
     // Mock payments
     setPayments([
       {
@@ -427,7 +504,8 @@ const SellerDashboard = () => {
         condition: condition as 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor',
         seller: {
           name: user.name,
-          rating: 0
+          rating: 0,
+          id: user.id || user.email
         },
         category,
         description,
@@ -457,7 +535,7 @@ const SellerDashboard = () => {
   };
 
   // Message management functions
-  const handleViewMessage = (message: Message) => {
+  const handleViewMessage = (message: any) => {
     // Mark as read
     const updatedMessages = messages.map(m => 
       m.id === message.id ? { ...m, read: true } : m
@@ -467,7 +545,30 @@ const SellerDashboard = () => {
   };
 
   const handleSendReply = () => {
-    if (!replyText.trim() || !currentMessage) return;
+    if (!replyText.trim() || !currentMessage || !user) return;
+    
+    // Create reply message
+    const replyMessage: Message = {
+      id: `msg_${Date.now()}`,
+      from: {
+        id: user.id || user.email,
+        name: user.name,
+        avatar: user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+      },
+      to: {
+        id: currentMessage.from.id || '',
+        name: currentMessage.from
+      },
+      content: replyText,
+      timestamp: new Date().toISOString(),
+      read: false,
+      productId: currentMessage.productId,
+      productTitle: currentMessage.productTitle
+    };
+    
+    // Store the message
+    const userMessages = getUserMessages(user.id || user.email);
+    localStorage.setItem('userMessages', JSON.stringify([...userMessages, replyMessage]));
     
     toast({
       title: "Reply sent",
@@ -479,25 +580,67 @@ const SellerDashboard = () => {
   };
 
   // Order management functions
-  const handleUpdateOrderStatus = (order: Order) => {
+  const handleUpdateOrderStatus = (order: any) => {
     setCurrentOrder(order);
     setOrderStatusDialog(true);
   };
 
-  const updateOrderStatus = (status: 'pending' | 'shipped' | 'delivered' | 'cancelled') => {
+  const updateOrderStatus = (status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled') => {
     if (!currentOrder) return;
     
+    // Update order status in local state
     const updatedOrders = orders.map(o => 
       o.id === currentOrder.id ? { ...o, status } : o
     );
     
     setOrders(updatedOrders);
+    
+    // Update in localStorage and broadcast
+    const ordersData = localStorage.getItem("userOrders") || "[]";
+    let ordersList: Order[] = JSON.parse(ordersData);
+    
+    ordersList = ordersList.map(o => 
+      o.id === currentOrder.id ? { ...o, status } : o
+    );
+    
+    localStorage.setItem("userOrders", JSON.stringify(ordersList));
+    
+    // Find the updated order to broadcast
+    const updatedOrder = ordersList.find(o => o.id === currentOrder.id);
+    if (updatedOrder) {
+      // Broadcast the update
+      updateOrder(currentOrder.id, { status });
+    }
+    
     setOrderStatusDialog(false);
     
     toast({
       title: "Order updated",
       description: `Order #${currentOrder.id} has been marked as ${status}`,
     });
+    
+    // If order is delivered, create a payment
+    if (status === 'delivered') {
+      // Extract the numeric part of the price
+      const priceStr = currentOrder.price.replace('₹', '').replace(',', '');
+      const price = parseFloat(priceStr) || 0;
+      
+      const newPayment = {
+        id: `PAY-${currentOrder.id.split('_')[1] || Date.now()}`,
+        amount: currentOrder.price,
+        from: currentOrder.customer,
+        for: currentOrder.product,
+        date: new Date().toLocaleDateString(),
+        status: 'completed' as 'completed' | 'pending' | 'failed'
+      };
+      
+      setPayments([newPayment, ...payments]);
+      
+      toast({
+        title: "Payment received",
+        description: `Payment for order #${currentOrder.id} has been processed`,
+      });
+    }
   };
 
   // Add listener for real-time updates
@@ -813,6 +956,9 @@ const SellerDashboard = () => {
                                 {order.status === 'pending' && (
                                   <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>
                                 )}
+                                {order.status === 'processing' && (
+                                  <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-100">Processing</Badge>
+                                )}
                                 {order.status === 'shipped' && (
                                   <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">Shipped</Badge>
                                 )}
@@ -908,7 +1054,6 @@ const SellerDashboard = () => {
                             type="text"
                             placeholder="Search messages..."
                             className="w-full"
-                            prefix={<Search className="h-4 w-4 text-gray-500" />}
                           />
                         </div>
                         <div className="overflow-y-auto h-[calc(500px-54px)]">
@@ -934,6 +1079,11 @@ const SellerDashboard = () => {
                                 </div>
                               </div>
                               <p className="text-sm text-gray-600 truncate pl-10">{message.content}</p>
+                              {message.productTitle && (
+                                <p className="text-xs text-gray-500 truncate pl-10">
+                                  Re: {message.productTitle}
+                                </p>
+                              )}
                               {!message.read && (
                                 <div className="pl-10 mt-1">
                                   <span className="inline-block w-2 h-2 bg-scrapeGenie-500 rounded-full"></span>
@@ -947,14 +1097,21 @@ const SellerDashboard = () => {
                       <div className="md:w-2/3 border rounded-lg flex flex-col">
                         {currentMessage ? (
                           <>
-                            <div className="p-4 bg-gray-50 border-b flex items-center">
-                              <div className="h-8 w-8 rounded-full bg-scrapeGenie-100 flex items-center justify-center mr-2">
-                                <span className="text-sm font-medium text-scrapeGenie-600">{currentMessage.avatar}</span>
+                            <div className="p-4 bg-gray-50 border-b flex items-center justify-between">
+                              <div className="flex items-center">
+                                <div className="h-8 w-8 rounded-full bg-scrapeGenie-100 flex items-center justify-center mr-2">
+                                  <span className="text-sm font-medium text-scrapeGenie-600">{currentMessage.avatar}</span>
+                                </div>
+                                <div>
+                                  <p className="font-medium">{currentMessage.from}</p>
+                                  <p className="text-xs text-gray-500">{currentMessage.timestamp}</p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-medium">{currentMessage.from}</p>
-                                <p className="text-xs text-gray-500">{currentMessage.timestamp}</p>
-                              </div>
+                              {currentMessage.productTitle && (
+                                <Badge variant="outline" className="bg-blue-50 text-blue-800">
+                                  Re: {currentMessage.productTitle}
+                                </Badge>
+                              )}
                             </div>
                             
                             <div className="flex-1 p-4 overflow-y-auto">
@@ -1265,6 +1422,14 @@ const SellerDashboard = () => {
                     </Button>
                     <Button 
                       type="button"
+                      variant={currentOrder.status === 'processing' ? 'default' : 'outline'}
+                      className={currentOrder.status === 'processing' ? '' : 'border-purple-500 text-purple-500 hover:bg-purple-50'}
+                      onClick={() => updateOrderStatus('processing')}
+                    >
+                      Processing
+                    </Button>
+                    <Button 
+                      type="button"
                       variant={currentOrder.status === 'shipped' ? 'default' : 'outline'}
                       className={currentOrder.status === 'shipped' ? '' : 'border-blue-500 text-blue-500 hover:bg-blue-50'}
                       onClick={() => updateOrderStatus('shipped')}
@@ -1284,6 +1449,7 @@ const SellerDashboard = () => {
                       variant={currentOrder.status === 'cancelled' ? 'default' : 'outline'}
                       className={currentOrder.status === 'cancelled' ? '' : 'border-red-500 text-red-500 hover:bg-red-50'}
                       onClick={() => updateOrderStatus('cancelled')}
+                      grid-column-span="2"
                     >
                       Cancelled
                     </Button>
@@ -1302,4 +1468,3 @@ const SellerDashboard = () => {
 };
 
 export default SellerDashboard;
-

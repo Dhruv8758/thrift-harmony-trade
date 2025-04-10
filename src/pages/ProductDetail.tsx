@@ -12,7 +12,8 @@ import {
   User, 
   Phone, 
   Mail, 
-  MessageCircle 
+  Heart,
+  ThumbsUp
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { 
@@ -20,27 +21,28 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import MessageDialog from "@/components/MessageDialog";
+import BuyProductDialog from "@/components/BuyProductDialog";
+import { getCurrentUser, toggleProductLike, subscribeToEvent } from "@/utils/realTimeUtils";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [message, setMessage] = useState("");
   const { toast } = useToast();
+  const currentUser = getCurrentUser();
+  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
     if (id) {
       const foundProduct = getProductById(id);
       setProduct(foundProduct || null);
+      
+      // Check if the current user has liked this product
+      if (foundProduct && currentUser) {
+        const userId = currentUser.id || currentUser.email;
+        setIsLiked((foundProduct.likedBy || []).includes(userId));
+      }
 
       // Find related products from the same category or by the same seller
       if (foundProduct) {
@@ -56,6 +58,47 @@ const ProductDetail = () => {
       }
     }
   }, [id]);
+
+  // Subscribe to real-time product updates
+  useEffect(() => {
+    const unsubscribe = subscribeToEvent<Product>("productUpdated", (updatedProduct) => {
+      if (updatedProduct.id === id) {
+        setProduct(updatedProduct);
+        
+        // Check if the current user has liked the updated product
+        if (currentUser) {
+          const userId = currentUser.id || currentUser.email;
+          setIsLiked((updatedProduct.likedBy || []).includes(userId));
+        }
+      }
+    });
+    
+    return () => unsubscribe();
+  }, [id]);
+
+  const handleLikeProduct = () => {
+    if (!currentUser || !product) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to like products",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const userId = currentUser.id || currentUser.email;
+    toggleProductLike(product.id, userId);
+    
+    // Optimistic UI update
+    setIsLiked(!isLiked);
+    
+    toast({
+      title: isLiked ? "Product unliked" : "Product liked",
+      description: isLiked 
+        ? "This product has been removed from your liked items" 
+        : "This product has been added to your liked items",
+    });
+  };
 
   if (!product) {
     return (
@@ -74,15 +117,8 @@ const ProductDetail = () => {
     );
   }
 
-  const handleContactSeller = () => {
-    toast({
-      title: "Message sent!",
-      description: `Your message has been sent to ${product?.seller.name}.`,
-    });
-    setMessage("");
-  };
-
   const priceInINR = product.price * 75;
+  const sellerId = product.seller.id || product.seller.name.replace(/\s+/g, '').toLowerCase();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -104,6 +140,27 @@ const ProductDetail = () => {
                   alt={product.title}
                   className="w-full h-[400px] object-cover object-center"
                 />
+              </div>
+              <div className="flex justify-between">
+                <Button 
+                  variant={isLiked ? "default" : "outline"} 
+                  size="sm"
+                  className={isLiked ? "bg-red-500 hover:bg-red-600" : ""}
+                  onClick={handleLikeProduct}
+                >
+                  <Heart className={`h-5 w-5 mr-2 ${isLiked ? "fill-current" : ""}`} />
+                  {isLiked ? "Liked" : "Like"} 
+                  {product.likes && product.likes > 0 && (
+                    <span className="ml-2 bg-gray-100 text-gray-800 text-xs px-2 py-0.5 rounded-full">
+                      {product.likes}
+                    </span>
+                  )}
+                </Button>
+                
+                <div className="flex items-center text-sm text-gray-500">
+                  <ThumbsUp className="h-4 w-4 mr-1" /> 
+                  {product.healthScore || 85}% Quality Score
+                </div>
               </div>
             </div>
             
@@ -163,42 +220,17 @@ const ProductDetail = () => {
                       </HoverCardContent>
                     </HoverCard>
                     
-                    <Dialog>
-                      <DialogTrigger asChild>
+                    <MessageDialog
+                      recipientId={sellerId}
+                      recipientName={product.seller.name}
+                      productId={product.id}
+                      productTitle={product.title}
+                      triggerComponent={
                         <Button variant="outline" size="lg" className="w-full">
-                          <MessageCircle className="h-4 w-4 mr-2" /> Message
+                          <Mail className="h-4 w-4 mr-2" /> Message
                         </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Message to {product.seller.name}</DialogTitle>
-                          <DialogDescription>
-                            Send a message directly to the seller about this item.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <div className="flex items-center space-x-2">
-                            <div className="font-medium">About:</div>
-                            <div className="text-sm text-muted-foreground">{product.title}</div>
-                          </div>
-                          <div className="grid gap-2">
-                            <div className="font-medium">Your message:</div>
-                            <Input
-                              placeholder="I'm interested in this item..."
-                              value={message}
-                              onChange={(e) => setMessage(e.target.value)}
-                              className="w-full"
-                            />
-                          </div>
-                          <Button 
-                            className="w-full" 
-                            onClick={handleContactSeller}
-                          >
-                            Send Message
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                      }
+                    />
                   </div>
                 </div>
               </div>
@@ -208,6 +240,12 @@ const ProductDetail = () => {
                   <p className="text-2xl font-bold text-gray-700">
                     ₹{priceInINR.toFixed(0)}
                   </p>
+                  <BuyProductDialog
+                    product={{
+                      ...product,
+                      price: priceInINR
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -222,9 +260,9 @@ const ProductDetail = () => {
               
               <TabsContent value="description" className="pt-4">
                 <p className="text-gray-700">
-                  This is a high-quality second-hand item in {product.condition} condition. 
+                  {product.description || `This is a high-quality second-hand item in ${product.condition} condition. 
                   The seller has taken great care of this item and it shows in its current state.
-                  Perfect for anyone looking to save money while still getting a great product.
+                  Perfect for anyone looking to save money while still getting a great product.`}
                 </p>
               </TabsContent>
               
@@ -234,6 +272,12 @@ const ProductDetail = () => {
                   <li>Original Purchase: 2 years ago</li>
                   <li>Signs of wear: Minimal</li>
                   <li>All original parts included</li>
+                  {product.verificationStatus && (
+                    <li>Verification Status: {product.verificationStatus}</li>
+                  )}
+                  {product.healthScore && (
+                    <li>Health Score: {product.healthScore}%</li>
+                  )}
                 </ul>
               </TabsContent>
             </Tabs>
