@@ -53,7 +53,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       setIsLoading(false);
     }
+
+    // Add event listener for real-time auth state sync across tabs
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
+
+  // Handle login/logout events across tabs
+  const handleStorageChange = (e: StorageEvent) => {
+    if (e.key === 'currentUser') {
+      if (e.newValue) {
+        // Another tab logged in
+        try {
+          const parsedUser = JSON.parse(e.newValue);
+          setUser(parsedUser);
+          toast({
+            title: "Session updated",
+            description: `You are now signed in as ${parsedUser.name}`,
+          });
+        } catch (error) {
+          console.error("Failed to parse user from storage event:", error);
+        }
+      } else {
+        // Another tab logged out
+        setUser(null);
+        toast({
+          title: "Session ended",
+          description: "You have been signed out in another tab",
+        });
+        navigate("/sign-in");
+      }
+    }
+  };
 
   // Check if user credentials are valid
   const validateUserCredentials = (email: string, password: string): boolean => {

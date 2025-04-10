@@ -18,4 +18,8 @@ export type Product = {
     conditionRank: number;
     aboveAverage: boolean;
   };
+  dateAdded?: string;
+  statusText?: 'Active' | 'Draft' | 'Pending Review';
+  views?: number;
+  likes?: number;
 };
