@@ -155,6 +155,12 @@ export const getUserOrders = (userId: string, role: 'buyer' | 'seller'): Order[]
     const ordersData = localStorage.getItem("userOrders") || "[]";
     const orders: Order[] = JSON.parse(ordersData);
     
+    if (orders.length === 0) {
+      // Generate mock orders if none exist
+      generateMockOrders();
+      return getUserOrders(userId, role);
+    }
+    
     // Filter orders based on role
     return orders.filter(
       (order) => role === 'buyer' ? order.buyerId === userId : order.sellerId === userId
@@ -162,6 +168,66 @@ export const getUserOrders = (userId: string, role: 'buyer' | 'seller'): Order[]
   } catch (error) {
     console.error("Error getting user orders:", error);
     return [];
+  }
+};
+
+// Generate mock orders for testing
+const generateMockOrders = () => {
+  try {
+    // Get existing products
+    const productsData = localStorage.getItem("allProducts") || "[]";
+    const products: Product[] = JSON.parse(productsData);
+    
+    if (products.length === 0) return;
+    
+    // Get current users
+    const usersData = localStorage.getItem("users") || "[]";
+    const users = JSON.parse(usersData);
+    const buyers = users.filter((user: any) => user.role === 'buyer' || !user.role);
+    
+    if (buyers.length === 0) return;
+    
+    const mockOrders: Order[] = [];
+    
+    // Create at least one order for each product
+    products.forEach((product, index) => {
+      if (!product.seller.id) return;
+      
+      const buyer = buyers[index % buyers.length];
+      if (!buyer) return;
+      
+      const statuses: Order['status'][] = ['pending', 'processing', 'shipped', 'delivered'];
+      const paymentMethods: Order['paymentMethod'][] = ['credit-card', 'debit-card', 'upi', 'cash-on-delivery', 'wallet'];
+      const paymentStatuses: Order['paymentStatus'][] = ['paid', 'pending', 'failed'];
+      
+      const mockOrder: Order = {
+        id: `order_${Date.now() + index}`,
+        productId: product.id,
+        productName: product.title,
+        productImage: product.image || '/placeholder.svg',
+        sellerId: product.seller.id,
+        sellerName: product.seller.name,
+        buyerId: buyer.id || buyer.email,
+        buyerName: buyer.name,
+        buyerEmail: buyer.email,
+        buyerPhone: buyer.phone || "+91 9876543210",
+        price: product.price,
+        date: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
+        status: statuses[Math.floor(Math.random() * statuses.length)],
+        deliveryAddress: "123 Main Street, Apartment 4B, Mumbai, Maharashtra, 400001, India",
+        contactNumber: "+91 9876543210",
+        paymentMethod: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
+        paymentStatus: paymentStatuses[Math.floor(Math.random() * paymentStatuses.length)]
+      };
+      
+      mockOrders.push(mockOrder);
+    });
+    
+    // Store the mock orders
+    localStorage.setItem("userOrders", JSON.stringify(mockOrders));
+    
+  } catch (error) {
+    console.error("Error generating mock orders:", error);
   }
 };
 
@@ -197,6 +263,69 @@ export const toggleProductLike = (productId: string, userId: string) => {
   } catch (error) {
     console.error("Error toggling product like:", error);
   }
+};
+
+// Store mock sellers for testing
+export const storeMockSellers = () => {
+  try {
+    const usersData = localStorage.getItem("users") || "[]";
+    let users = JSON.parse(usersData);
+    
+    // Check if we already have sellers
+    const hasSellers = users.some((user: any) => user.role === 'seller');
+    if (hasSellers) return;
+    
+    // Mock sellers
+    const mockSellers = [
+      {
+        id: "seller_1",
+        name: "TechDeals Store",
+        email: "tech@example.com",
+        password: "password123", // In a real app, this would be hashed
+        role: "seller",
+        memberSince: "Jan 2023",
+        phone: "+91 9876543210"
+      },
+      {
+        id: "seller_2",
+        name: "Fashion Finds",
+        email: "fashion@example.com",
+        password: "password123",
+        role: "seller",
+        memberSince: "Mar 2023",
+        phone: "+91 9876543211"
+      },
+      {
+        id: "seller_3",
+        name: "Home Essentials",
+        email: "home@example.com",
+        password: "password123",
+        role: "seller",
+        memberSince: "Jun 2023",
+        phone: "+91 9876543212"
+      }
+    ];
+    
+    // Add mock sellers to users
+    users = [...users, ...mockSellers];
+    localStorage.setItem("users", JSON.stringify(users));
+    
+    console.log("Mock sellers created:");
+    mockSellers.forEach(seller => {
+      console.log(`- ${seller.name} (${seller.email}) - Password: ${seller.password}`);
+    });
+    
+  } catch (error) {
+    console.error("Error storing mock sellers:", error);
+  }
+};
+
+// Initialize mock data - call this on app startup
+export const initializeMockData = () => {
+  storeMockSellers();
+  setTimeout(() => {
+    generateMockOrders();
+  }, 1000);
 };
 
 // Re-export types for convenience

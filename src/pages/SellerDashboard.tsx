@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -19,7 +18,8 @@ import {
   Trash2,
   CheckCircle,
   X,
-  Search
+  Search,
+  Eye
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import OrderDetailDialog from "@/components/OrderDetailDialog";
 import { Product, Message, Order } from "@/types/product";
 import { 
   getUserMessages, 
@@ -51,7 +52,8 @@ import {
   updateOrder, 
   subscribeToEvent, 
   getCurrentUser, 
-  storeMessage
+  storeMessage,
+  initializeMockData
 } from "@/utils/realTimeUtils";
 import { 
   UIMessage, 
@@ -100,18 +102,19 @@ const SellerDashboard = () => {
   // Orders state
   const [orders, setOrders] = useState<UIOrder[]>([]);
   const [orderStatusDialog, setOrderStatusDialog] = useState(false);
+  const [orderDetailDialog, setOrderDetailDialog] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<UIOrder | null>(null);
   
   // Payments state
   const [payments, setPayments] = useState<Payment[]>([]);
 
   useEffect(() => {
-    // Check if the user is logged in and is a seller
+    initializeMockData();
+    
     const currentUser = localStorage.getItem("currentUser");
     if (currentUser) {
       const parsedUser = JSON.parse(currentUser);
       if (parsedUser.role !== "seller") {
-        // Redirect to sign in if not a seller
         toast({
           title: "Access denied",
           description: "You need a seller account to access this page",
@@ -122,16 +125,13 @@ const SellerDashboard = () => {
       }
       setUser(parsedUser);
       
-      // Load real messages for this seller
       const userMessages = getUserMessages(parsedUser.id || parsedUser.email);
       const formattedMessages = userMessages.map(msg => convertToUIMessage(msg));
       setMessages(formattedMessages);
       
-      // Load real orders for this seller
       const userOrders = getUserOrders(parsedUser.id || parsedUser.email, 'seller');
       setOrders(userOrders.map(order => convertToUIOrder(order)));
       
-      // Generate payments based on orders
       const generatedPayments = userOrders
         .filter(order => order.status === 'delivered')
         .map(order => createPaymentFromOrder(order));
@@ -139,11 +139,9 @@ const SellerDashboard = () => {
       if (generatedPayments.length > 0) {
         setPayments(generatedPayments);
       } else {
-        // Load mock payments if no real ones exist
         loadMockPayments();
       }
     } else {
-      // Redirect to sign in if not logged in
       toast({
         title: "Authentication required",
         description: "Please sign in to access seller dashboard",
@@ -152,11 +150,9 @@ const SellerDashboard = () => {
       navigate("/sign-in");
     }
 
-    // Load mock data for products
     loadMockProducts();
     setIsLoading(false);
     
-    // Subscribe to real-time updates
     const unsubscribeNewMessage = subscribeToEvent<Message>("newMessage", handleNewMessage);
     const unsubscribeNewOrder = subscribeToEvent<Order>("newOrder", handleNewOrder);
     const unsubscribeOrderUpdated = subscribeToEvent<Order>("orderUpdated", handleOrderUpdated);
@@ -168,11 +164,9 @@ const SellerDashboard = () => {
     };
   }, [navigate, toast]);
 
-  // Real-time event handlers
   const handleNewMessage = (message: Message) => {
     if (!user) return;
     
-    // Check if this message is for the current user
     if (message.to.id === (user.id || user.email)) {
       const formattedMessage = convertToUIMessage(message);
       
@@ -188,7 +182,6 @@ const SellerDashboard = () => {
   const handleNewOrder = (order: Order) => {
     if (!user) return;
     
-    // Check if this order is for the current user as a seller
     if (order.sellerId === (user.id || user.email)) {
       const formattedOrder = convertToUIOrder(order);
       
@@ -204,7 +197,6 @@ const SellerDashboard = () => {
   const handleOrderUpdated = (order: Order) => {
     if (!user) return;
     
-    // Check if this order is for the current user as a seller
     if (order.sellerId === (user.id || user.email)) {
       setOrders(prevOrders => 
         prevOrders.map(prevOrder => 
@@ -212,7 +204,6 @@ const SellerDashboard = () => {
             ? {
                 ...prevOrder,
                 status: order.status,
-                // Update any other fields that might have changed
               }
             : prevOrder
         )
@@ -223,7 +214,6 @@ const SellerDashboard = () => {
         description: `Order status for ${order.productName} has been updated to ${order.status}`,
       });
       
-      // If order is delivered, add a payment
       if (order.status === 'delivered') {
         const newPayment = createPaymentFromOrder(order);
         setPayments(prevPayments => [newPayment, ...prevPayments]);
@@ -232,7 +222,6 @@ const SellerDashboard = () => {
   };
 
   const loadMockProducts = () => {
-    // Mock products
     const mockProducts: SellerProduct[] = [
       {
         id: '1',
@@ -297,7 +286,6 @@ const SellerDashboard = () => {
   };
   
   const loadMockPayments = () => {
-    // Mock payments
     setPayments([
       {
         id: 'PAY-2001',
@@ -339,7 +327,6 @@ const SellerDashboard = () => {
     setActiveTab(value);
   };
 
-  // Product management functions
   const handleAddProduct = () => {
     setCurrentProduct(null);
     setProductForm({
@@ -381,7 +368,6 @@ const SellerDashboard = () => {
     setProducts(products.filter(p => p.id !== currentProduct.id));
     setDeleteProductDialog(false);
     
-    // Broadcast the change to all tabs/windows
     localStorage.setItem('product_deleted', JSON.stringify({
       id: currentProduct.id,
       timestamp: new Date().getTime()
@@ -413,7 +399,6 @@ const SellerDashboard = () => {
     }
     
     if (currentProduct) {
-      // Edit existing product
       const updatedProducts = products.map(product => 
         product.id === currentProduct.id ? {
           ...product,
@@ -428,7 +413,6 @@ const SellerDashboard = () => {
       
       setProducts(updatedProducts);
       
-      // Broadcast the change to all tabs/windows
       localStorage.setItem('product_updated', JSON.stringify({
         product: {
           id: currentProduct.id,
@@ -447,7 +431,6 @@ const SellerDashboard = () => {
         description: "Your product has been successfully updated",
       });
     } else {
-      // Add new product
       const newProduct: SellerProduct = {
         id: `${Date.now()}`,
         title,
@@ -471,7 +454,6 @@ const SellerDashboard = () => {
       
       setProducts([newProduct, ...products]);
       
-      // Broadcast the change to all tabs/windows
       localStorage.setItem('product_added', JSON.stringify({
         product: newProduct,
         timestamp: new Date().getTime()
@@ -486,9 +468,7 @@ const SellerDashboard = () => {
     setProductDialog(false);
   };
 
-  // Message management functions
   const handleViewMessage = (message: UIMessage) => {
-    // Mark as read
     const updatedMessages = messages.map(m => 
       m.id === message.id ? { ...m, read: true } : m
     );
@@ -499,7 +479,6 @@ const SellerDashboard = () => {
   const handleSendReply = () => {
     if (!replyText.trim() || !currentMessage || !user) return;
     
-    // Create reply message
     const replyMessage: Message = {
       id: `msg_${Date.now()}`,
       from: {
@@ -508,7 +487,7 @@ const SellerDashboard = () => {
         avatar: user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
       },
       to: {
-        id: currentMessage.productId || '',  // Use any available ID as a fallback
+        id: currentMessage.productId || '',
         name: currentMessage.from
       },
       content: replyText,
@@ -518,7 +497,6 @@ const SellerDashboard = () => {
       productTitle: currentMessage.productTitle
     };
     
-    // Store the message
     storeMessage(replyMessage);
     
     toast({
@@ -530,7 +508,6 @@ const SellerDashboard = () => {
     setCurrentMessage(null);
   };
 
-  // Order management functions
   const handleUpdateOrderStatus = (order: UIOrder) => {
     setCurrentOrder(order);
     setOrderStatusDialog(true);
@@ -539,14 +516,12 @@ const SellerDashboard = () => {
   const updateOrderStatus = (status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled') => {
     if (!currentOrder) return;
     
-    // Update order status in local state
     const updatedOrders = orders.map(o => 
       o.id === currentOrder.id ? { ...o, status } : o
     );
     
     setOrders(updatedOrders);
     
-    // Update in localStorage and broadcast
     const ordersData = localStorage.getItem("userOrders") || "[]";
     let ordersList: Order[] = JSON.parse(ordersData);
     
@@ -556,10 +531,8 @@ const SellerDashboard = () => {
     
     localStorage.setItem("userOrders", JSON.stringify(ordersList));
     
-    // Find the updated order to broadcast
     const updatedOrder = ordersList.find(o => o.id === currentOrder.id);
     if (updatedOrder) {
-      // Broadcast the update
       updateOrder(currentOrder.id, { status });
     }
     
@@ -570,9 +543,7 @@ const SellerDashboard = () => {
       description: `Order #${currentOrder.id} has been marked as ${status}`,
     });
     
-    // If order is delivered, create a payment
     if (status === 'delivered') {
-      // Extract the numeric part of the price
       const priceStr = currentOrder.price.replace('₹', '').replace(',', '');
       const price = parseFloat(priceStr) || 0;
       
@@ -594,13 +565,16 @@ const SellerDashboard = () => {
     }
   };
 
-  // Add listener for real-time updates
+  const handleViewOrderDetails = (order: UIOrder) => {
+    setCurrentOrder(order);
+    setOrderDetailDialog(true);
+  };
+
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'product_updated' && e.newValue) {
         const { product, timestamp } = JSON.parse(e.newValue);
         
-        // Only update if we're not the source of this update
         if (timestamp !== localStorage.getItem('last_update_timestamp')) {
           setProducts(currentProducts => 
             currentProducts.map(p => 
@@ -618,7 +592,6 @@ const SellerDashboard = () => {
       if (e.key === 'product_added' && e.newValue) {
         const { product, timestamp } = JSON.parse(e.newValue);
         
-        // Only update if we're not the source of this update
         if (timestamp !== localStorage.getItem('last_update_timestamp')) {
           setProducts(currentProducts => [product, ...currentProducts]);
           
@@ -632,7 +605,6 @@ const SellerDashboard = () => {
       if (e.key === 'product_deleted' && e.newValue) {
         const { id, timestamp } = JSON.parse(e.newValue);
         
-        // Only update if we're not the source of this update
         if (timestamp !== localStorage.getItem('last_update_timestamp')) {
           const productToDelete = products.find(p => p.id === id);
           if (productToDelete) {
@@ -683,7 +655,6 @@ const SellerDashboard = () => {
           </div>
           
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Sidebar */}
             <div className="md:w-1/4">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
                 <div className="flex flex-col items-center mb-6">
@@ -760,7 +731,6 @@ const SellerDashboard = () => {
               </div>
             </div>
             
-            {/* Main Content */}
             <div className="md:w-3/4">
               <Tabs value={activeTab} onValueChange={handleTabChange}>
                 <TabsList className="mb-6">
@@ -772,7 +742,6 @@ const SellerDashboard = () => {
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
                 
-                {/* Products Tab */}
                 <TabsContent value="listings" className="bg-white p-6 rounded-lg shadow-sm border">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-semibold">My Products</h3>
@@ -786,7 +755,7 @@ const SellerDashboard = () => {
                     <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
                       <Package className="h-12 w-12 mx-auto text-gray-400 mb-3" />
                       <h4 className="text-lg font-medium text-gray-900 mb-1">No products yet</h4>
-                      <p className="text-gray-500 mb-4">Start selling by adding your first product</p>
+                      <p className="text-gray-500">Start selling by adding your first product</p>
                       <Button onClick={handleAddProduct}>
                         <Plus className="h-4 w-4 mr-2" />
                         Add Product
@@ -871,7 +840,6 @@ const SellerDashboard = () => {
                   )}
                 </TabsContent>
                 
-                {/* Orders Tab */}
                 <TabsContent value="orders" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-6">Orders</h3>
                   
@@ -899,7 +867,18 @@ const SellerDashboard = () => {
                           {orders.map(order => (
                             <TableRow key={order.id}>
                               <TableCell className="font-medium">{order.id}</TableCell>
-                              <TableCell>{order.product}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center space-x-2">
+                                  <div className="h-8 w-8 bg-gray-100 rounded-md overflow-hidden">
+                                    <img 
+                                      src={order.productImage || '/placeholder.svg'} 
+                                      alt={order.product}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  </div>
+                                  <span>{order.product}</span>
+                                </div>
+                              </TableCell>
                               <TableCell>{order.customer}</TableCell>
                               <TableCell>{order.price}</TableCell>
                               <TableCell>{order.date}</TableCell>
@@ -921,13 +900,23 @@ const SellerDashboard = () => {
                                 )}
                               </TableCell>
                               <TableCell>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => handleUpdateOrderStatus(order)}
-                                >
-                                  Update Status
-                                </Button>
+                                <div className="flex space-x-2">
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => handleViewOrderDetails(order)}
+                                  >
+                                    <Eye className="h-4 w-4 mr-1" />
+                                    View
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => handleUpdateOrderStatus(order)}
+                                  >
+                                    Update
+                                  </Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -937,7 +926,6 @@ const SellerDashboard = () => {
                   )}
                 </TabsContent>
 
-                {/* Payments Tab */}
                 <TabsContent value="payments" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-6">Payments</h3>
                   
@@ -987,7 +975,6 @@ const SellerDashboard = () => {
                   )}
                 </TabsContent>
 
-                {/* Messages Tab */}
                 <TabsContent value="messages" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-6">Messages</h3>
                   
@@ -1047,7 +1034,6 @@ const SellerDashboard = () => {
                     </div>
                   )}
 
-                  {/* Message View/Reply Dialog */}
                   {currentMessage && (
                     <Dialog open={!!currentMessage} onOpenChange={() => setCurrentMessage(null)}>
                       <DialogContent className="sm:max-w-md">
@@ -1097,7 +1083,6 @@ const SellerDashboard = () => {
                   )}
                 </TabsContent>
 
-                {/* Analytics Tab */}
                 <TabsContent value="analytics" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-6">Analytics</h3>
                   <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
@@ -1107,7 +1092,6 @@ const SellerDashboard = () => {
                   </div>
                 </TabsContent>
 
-                {/* Settings Tab */}
                 <TabsContent value="settings" className="bg-white p-6 rounded-lg shadow-sm border">
                   <h3 className="text-xl font-semibold mb-6">Settings</h3>
                   <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
@@ -1121,7 +1105,6 @@ const SellerDashboard = () => {
           </div>
         </div>
 
-        {/* Product Form Dialog */}
         <Dialog open={productDialog} onOpenChange={setProductDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -1216,7 +1199,6 @@ const SellerDashboard = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Delete Product Confirmation Dialog */}
         <Dialog open={deleteProductDialog} onOpenChange={setDeleteProductDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -1253,7 +1235,6 @@ const SellerDashboard = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Order Status Update Dialog */}
         <Dialog open={orderStatusDialog} onOpenChange={setOrderStatusDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -1318,6 +1299,12 @@ const SellerDashboard = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <OrderDetailDialog
+          order={currentOrder}
+          open={orderDetailDialog}
+          onClose={() => setOrderDetailDialog(false)}
+        />
       </main>
       <Footer />
     </div>
