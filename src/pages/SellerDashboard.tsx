@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -43,23 +44,24 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Product, Message, Order } from "@/types/product";
+import { Product } from "@/types/product";
 import { 
   getUserMessages, 
   getUserOrders, 
   updateOrder, 
   subscribeToEvent, 
-  getCurrentUser, 
-  storeMessage
+  getCurrentUser 
 } from "@/utils/realTimeUtils";
-import { 
-  UIMessage, 
-  UIOrder, 
-  Payment, 
-  convertToUIMessage,
-  convertToUIOrder,
-  createPaymentFromOrder
-} from "@/types/sellerDashboard";
+import { Message, Order } from "@/utils/realTimeUtils";
+
+interface Payment {
+  id: string;
+  amount: string;
+  from: string;
+  for: string;
+  date: string;
+  status: 'completed' | 'pending' | 'failed';
+}
 
 interface SellerProduct extends Product {
   dateAdded: string;
@@ -92,14 +94,14 @@ const SellerDashboard = () => {
   });
 
   // Messages state
-  const [messages, setMessages] = useState<UIMessage[]>([]);
-  const [currentMessage, setCurrentMessage] = useState<UIMessage | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [currentMessage, setCurrentMessage] = useState<Message | null>(null);
   const [replyText, setReplyText] = useState('');
   
   // Orders state
-  const [orders, setOrders] = useState<UIOrder[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [orderStatusDialog, setOrderStatusDialog] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState<UIOrder | null>(null);
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   
   // Payments state
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -123,17 +125,40 @@ const SellerDashboard = () => {
       
       // Load real messages for this seller
       const userMessages = getUserMessages(parsedUser.id || parsedUser.email);
-      const formattedMessages = userMessages.map(msg => convertToUIMessage(msg));
+      const formattedMessages = userMessages.map(msg => ({
+        id: msg.id,
+        from: msg.from.name,
+        avatar: msg.from.avatar,
+        content: msg.content,
+        timestamp: new Date(msg.timestamp).toLocaleString(),
+        read: msg.read,
+        productId: msg.productId,
+        productTitle: msg.productTitle
+      }));
       setMessages(formattedMessages);
       
       // Load real orders for this seller
       const userOrders = getUserOrders(parsedUser.id || parsedUser.email, 'seller');
-      setOrders(userOrders.map(order => convertToUIOrder(order)));
+      setOrders(userOrders.map(order => ({
+        id: order.id,
+        product: order.productName,
+        customer: order.buyerName,
+        price: `₹${order.price.toLocaleString()}`,
+        status: order.status,
+        date: new Date(order.date).toLocaleDateString()
+      })));
       
       // Generate payments based on orders
       const generatedPayments = userOrders
         .filter(order => order.status === 'delivered')
-        .map(order => createPaymentFromOrder(order));
+        .map(order => ({
+          id: `PAY-${order.id.split('_')[1]}`,
+          amount: `₹${order.price.toLocaleString()}`,
+          from: order.buyerName,
+          for: order.productName,
+          date: new Date(order.date).toLocaleDateString(),
+          status: 'completed' as 'completed' | 'pending' | 'failed'
+        }));
         
       if (generatedPayments.length > 0) {
         setPayments(generatedPayments);
@@ -173,7 +198,16 @@ const SellerDashboard = () => {
     
     // Check if this message is for the current user
     if (message.to.id === (user.id || user.email)) {
-      const formattedMessage = convertToUIMessage(message);
+      const formattedMessage = {
+        id: message.id,
+        from: message.from.name,
+        avatar: message.from.avatar,
+        content: message.content,
+        timestamp: new Date(message.timestamp).toLocaleString(),
+        read: false,
+        productId: message.productId,
+        productTitle: message.productTitle
+      };
       
       setMessages(prevMessages => [formattedMessage, ...prevMessages]);
       
@@ -189,7 +223,14 @@ const SellerDashboard = () => {
     
     // Check if this order is for the current user as a seller
     if (order.sellerId === (user.id || user.email)) {
-      const formattedOrder = convertToUIOrder(order);
+      const formattedOrder = {
+        id: order.id,
+        product: order.productName,
+        customer: order.buyerName,
+        price: `₹${order.price.toLocaleString()}`,
+        status: order.status,
+        date: new Date(order.date).toLocaleDateString()
+      };
       
       setOrders(prevOrders => [formattedOrder, ...prevOrders]);
       
@@ -224,7 +265,15 @@ const SellerDashboard = () => {
       
       // If order is delivered, add a payment
       if (order.status === 'delivered') {
-        const newPayment = createPaymentFromOrder(order);
+        const newPayment = {
+          id: `PAY-${order.id.split('_')[1]}`,
+          amount: `₹${order.price.toLocaleString()}`,
+          from: order.buyerName,
+          for: order.productName,
+          date: new Date(order.date).toLocaleDateString(),
+          status: 'completed' as 'completed' | 'pending' | 'failed'
+        };
+        
         setPayments(prevPayments => [newPayment, ...prevPayments]);
       }
     }
@@ -486,7 +535,7 @@ const SellerDashboard = () => {
   };
 
   // Message management functions
-  const handleViewMessage = (message: UIMessage) => {
+  const handleViewMessage = (message: any) => {
     // Mark as read
     const updatedMessages = messages.map(m => 
       m.id === message.id ? { ...m, read: true } : m
@@ -507,7 +556,7 @@ const SellerDashboard = () => {
         avatar: user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
       },
       to: {
-        id: currentMessage.productId || '',  // Use any available ID as a fallback
+        id: currentMessage.from.id || '',
         name: currentMessage.from
       },
       content: replyText,
@@ -518,7 +567,8 @@ const SellerDashboard = () => {
     };
     
     // Store the message
-    storeMessage(replyMessage);
+    const userMessages = getUserMessages(user.id || user.email);
+    localStorage.setItem('userMessages', JSON.stringify([...userMessages, replyMessage]));
     
     toast({
       title: "Reply sent",
@@ -530,7 +580,7 @@ const SellerDashboard = () => {
   };
 
   // Order management functions
-  const handleUpdateOrderStatus = (order: UIOrder) => {
+  const handleUpdateOrderStatus = (order: any) => {
     setCurrentOrder(order);
     setOrderStatusDialog(true);
   };
@@ -575,16 +625,16 @@ const SellerDashboard = () => {
       const priceStr = currentOrder.price.replace('₹', '').replace(',', '');
       const price = parseFloat(priceStr) || 0;
       
-      const newPayment: Payment = {
+      const newPayment = {
         id: `PAY-${currentOrder.id.split('_')[1] || Date.now()}`,
         amount: currentOrder.price,
         from: currentOrder.customer,
         for: currentOrder.product,
         date: new Date().toLocaleDateString(),
-        status: 'completed'
+        status: 'completed' as 'completed' | 'pending' | 'failed'
       };
       
-      setPayments(prevPayments => [newPayment, ...prevPayments]);
+      setPayments([newPayment, ...payments]);
       
       toast({
         title: "Payment received",
@@ -916,4 +966,505 @@ const SellerDashboard = () => {
                                   <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Delivered</Badge>
                                 )}
                                 {order.status === 'cancelled' && (
-                                  <Badge variant="outline" className="bg-red-100 text-red-800 hover:
+                                  <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Cancelled</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleUpdateOrderStatus(order)}
+                                >
+                                  Update Status
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                {/* Payments Tab */}
+                <TabsContent value="payments" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-6">Payments</h3>
+                  
+                  {payments.length === 0 ? (
+                    <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
+                      <DollarSign className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                      <h4 className="text-lg font-medium text-gray-900 mb-1">No payments yet</h4>
+                      <p className="text-gray-500">Payments will appear here after customers complete purchases</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Payment ID</TableHead>
+                            <TableHead>Amount</TableHead>
+                            <TableHead>From</TableHead>
+                            <TableHead>For</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {payments.map(payment => (
+                            <TableRow key={payment.id}>
+                              <TableCell className="font-medium">{payment.id}</TableCell>
+                              <TableCell>{payment.amount}</TableCell>
+                              <TableCell>{payment.from}</TableCell>
+                              <TableCell>{payment.for}</TableCell>
+                              <TableCell>{payment.date}</TableCell>
+                              <TableCell>
+                                {payment.status === 'completed' && (
+                                  <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>
+                                )}
+                                {payment.status === 'pending' && (
+                                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>
+                                )}
+                                {payment.status === 'failed' && (
+                                  <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Failed</Badge>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                {/* Messages Tab */}
+                <TabsContent value="messages" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-6">Messages</h3>
+                  
+                  {messages.length === 0 ? (
+                    <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed">
+                      <MessageSquare className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                      <h4 className="text-lg font-medium text-gray-900 mb-1">No messages yet</h4>
+                      <p className="text-gray-500">Messages from customers will appear here</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col md:flex-row gap-4 h-[500px]">
+                      <div className="md:w-1/3 border rounded-lg overflow-hidden">
+                        <div className="p-3 bg-gray-50 border-b">
+                          <Input
+                            type="text"
+                            placeholder="Search messages..."
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="overflow-y-auto h-[calc(500px-54px)]">
+                          {messages.map((message) => (
+                            <div 
+                              key={message.id}
+                              className={`p-3 border-b cursor-pointer ${
+                                currentMessage?.id === message.id 
+                                  ? 'bg-scrapeGenie-50' 
+                                  : message.read ? 'bg-white' : 'bg-blue-50'
+                              } hover:bg-gray-50`}
+                              onClick={() => handleViewMessage(message)}
+                            >
+                              <div className="flex items-center mb-1">
+                                <div className="h-8 w-8 rounded-full bg-scrapeGenie-100 flex items-center justify-center mr-2 flex-shrink-0">
+                                  <span className="text-sm font-medium text-scrapeGenie-600">{message.avatar}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex justify-between">
+                                    <p className="font-medium truncate">{message.from}</p>
+                                    <p className="text-xs text-gray-500">{message.timestamp}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <p className="text-sm text-gray-600 truncate pl-10">{message.content}</p>
+                              {message.productTitle && (
+                                <p className="text-xs text-gray-500 truncate pl-10">
+                                  Re: {message.productTitle}
+                                </p>
+                              )}
+                              {!message.read && (
+                                <div className="pl-10 mt-1">
+                                  <span className="inline-block w-2 h-2 bg-scrapeGenie-500 rounded-full"></span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="md:w-2/3 border rounded-lg flex flex-col">
+                        {currentMessage ? (
+                          <>
+                            <div className="p-4 bg-gray-50 border-b flex items-center justify-between">
+                              <div className="flex items-center">
+                                <div className="h-8 w-8 rounded-full bg-scrapeGenie-100 flex items-center justify-center mr-2">
+                                  <span className="text-sm font-medium text-scrapeGenie-600">{currentMessage.avatar}</span>
+                                </div>
+                                <div>
+                                  <p className="font-medium">{currentMessage.from}</p>
+                                  <p className="text-xs text-gray-500">{currentMessage.timestamp}</p>
+                                </div>
+                              </div>
+                              {currentMessage.productTitle && (
+                                <Badge variant="outline" className="bg-blue-50 text-blue-800">
+                                  Re: {currentMessage.productTitle}
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <div className="flex-1 p-4 overflow-y-auto">
+                              <div className="mb-4 bg-gray-100 rounded-lg p-3 inline-block">
+                                <p className="text-gray-800">{currentMessage.content}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="p-4 border-t">
+                              <div className="flex space-x-2">
+                                <div className="flex-1">
+                                  <Textarea 
+                                    placeholder="Type your reply..." 
+                                    className="w-full" 
+                                    rows={3}
+                                    value={replyText}
+                                    onChange={(e) => setReplyText(e.target.value)}
+                                  />
+                                </div>
+                                <Button 
+                                  className="self-end"
+                                  onClick={handleSendReply}
+                                  disabled={!replyText.trim()}
+                                >
+                                  Send
+                                </Button>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-gray-500 flex-col p-8">
+                            <MessageSquare className="h-12 w-12 text-gray-300 mb-4" />
+                            <p>Select a conversation to view messages</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                {/* Analytics Tab */}
+                <TabsContent value="analytics" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-4">Sales Analytics</h3>
+                  <div className="text-gray-500 mb-6">Track your sales performance</div>
+                  
+                  {/* Analytics content */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <h4 className="text-gray-500 text-sm mb-1">Total Sales</h4>
+                      <div className="text-2xl font-bold">₹45,250</div>
+                      <div className="text-green-500 text-sm">+15% from last month</div>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <h4 className="text-gray-500 text-sm mb-1">Orders</h4>
+                      <div className="text-2xl font-bold">24</div>
+                      <div className="text-green-500 text-sm">+8% from last month</div>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <h4 className="text-gray-500 text-sm mb-1">Average Order Value</h4>
+                      <div className="text-2xl font-bold">₹1,885</div>
+                      <div className="text-green-500 text-sm">+5% from last month</div>
+                    </div>
+                  </div>
+                  
+                  <div className="h-64 bg-gray-100 rounded-lg border flex items-center justify-center">
+                    <p className="text-gray-500">Sales chart will appear here</p>
+                  </div>
+                </TabsContent>
+                
+                {/* Settings Tab */}
+                <TabsContent value="settings" className="bg-white p-6 rounded-lg shadow-sm border">
+                  <h3 className="text-xl font-semibold mb-4">Account Settings</h3>
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="font-medium mb-2">Personal Information</h4>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="block text-sm font-medium text-gray-700 mb-1">Name</Label>
+                            <Input type="text" className="w-full" defaultValue={user.name} />
+                          </div>
+                          <div>
+                            <Label className="block text-sm font-medium text-gray-700 mb-1">Email</Label>
+                            <Input type="email" className="w-full" defaultValue={user.email} />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="block text-sm font-medium text-gray-700 mb-1">Phone</Label>
+                            <Input type="tel" className="w-full" defaultValue={user.phone || ""} />
+                          </div>
+                          <div>
+                            <Label className="block text-sm font-medium text-gray-700 mb-1">Location</Label>
+                            <Input type="text" className="w-full" defaultValue={user.location || ""} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">Store Information</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="block text-sm font-medium text-gray-700 mb-1">Store Name</Label>
+                          <Input type="text" className="w-full" defaultValue="Your Store Name" />
+                        </div>
+                        <div>
+                          <Label className="block text-sm font-medium text-gray-700 mb-1">Store Description</Label>
+                          <Textarea 
+                            className="w-full" 
+                            rows={3}
+                            defaultValue="We sell high-quality products at affordable prices."
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">Payment Information</h4>
+                      <div>
+                        <Label className="block text-sm font-medium text-gray-700 mb-1">Bank Account</Label>
+                        <Input type="text" className="w-full" placeholder="Add your bank account" />
+                      </div>
+                    </div>
+                    
+                    <Button className="bg-scrapeGenie-600 hover:bg-scrapeGenie-700">Save Changes</Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <Footer />
+      
+      {/* Add/Edit Product Dialog */}
+      <Dialog open={productDialog} onOpenChange={setProductDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{currentProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
+            <DialogDescription>
+              {currentProduct ? "Update your product information" : "Enter details to list a new product"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Product Title</Label>
+              <Input
+                id="title"
+                value={productForm.title}
+                onChange={(e) => handleProductFormChange('title', e.target.value)}
+                placeholder="What are you selling?"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="price">Price (₹)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  value={productForm.price}
+                  onChange={(e) => handleProductFormChange('price', e.target.value)}
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="condition">Condition</Label>
+                <Select 
+                  value={productForm.condition} 
+                  onValueChange={(value) => handleProductFormChange('condition', value)}
+                >
+                  <SelectTrigger id="condition">
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="New">New</SelectItem>
+                    <SelectItem value="Like New">Like New</SelectItem>
+                    <SelectItem value="Good">Good</SelectItem>
+                    <SelectItem value="Fair">Fair</SelectItem>
+                    <SelectItem value="Poor">Poor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="category">Category</Label>
+              <Select 
+                value={productForm.category} 
+                onValueChange={(value) => handleProductFormChange('category', value)}
+              >
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Electronics">Electronics</SelectItem>
+                  <SelectItem value="Clothing">Clothing</SelectItem>
+                  <SelectItem value="Home & Garden">Home & Garden</SelectItem>
+                  <SelectItem value="Sports & Outdoors">Sports & Outdoors</SelectItem>
+                  <SelectItem value="Kitchen">Kitchen</SelectItem>
+                  <SelectItem value="Toys & Games">Toys & Games</SelectItem>
+                  <SelectItem value="Books & Media">Books & Media</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea 
+                id="description" 
+                value={productForm.description}
+                onChange={(e) => handleProductFormChange('description', e.target.value)}
+                placeholder="Describe your item in detail" 
+                className="min-h-[100px]"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="status">Listing Status</Label>
+              <Select 
+                value={productForm.statusText} 
+                onValueChange={(value) => handleProductFormChange('statusText', value)}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active (Visible to buyers)</SelectItem>
+                  <SelectItem value="Draft">Draft (Save for later)</SelectItem>
+                  <SelectItem value="Pending Review">Pending Review</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setProductDialog(false)}>Cancel</Button>
+            <Button onClick={saveProduct}>{currentProduct ? "Update Product" : "Add Product"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Product Confirmation Dialog */}
+      <Dialog open={deleteProductDialog} onOpenChange={setDeleteProductDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this product? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {currentProduct && (
+              <Alert variant="destructive">
+                <AlertTitle className="flex items-center">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete "{currentProduct.title}"
+                </AlertTitle>
+                <AlertDescription>
+                  This will permanently remove the product from your listings.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteProductDialog(false)}>Cancel</Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteProduct}
+            >
+              Delete Product
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Order Status Update Dialog */}
+      <Dialog open={orderStatusDialog} onOpenChange={setOrderStatusDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Update Order Status</DialogTitle>
+            <DialogDescription>
+              Change the status of this order
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {currentOrder && (
+              <div className="space-y-4">
+                <div>
+                  <p className="font-medium">Order #{currentOrder.id}</p>
+                  <p className="text-sm text-gray-500">{currentOrder.product} - {currentOrder.price}</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Select Status</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      type="button"
+                      variant={currentOrder.status === 'pending' ? 'default' : 'outline'}
+                      className={currentOrder.status === 'pending' ? '' : 'border-yellow-500 text-yellow-500 hover:bg-yellow-50'}
+                      onClick={() => updateOrderStatus('pending')}
+                    >
+                      Pending
+                    </Button>
+                    <Button 
+                      type="button"
+                      variant={currentOrder.status === 'processing' ? 'default' : 'outline'}
+                      className={currentOrder.status === 'processing' ? '' : 'border-purple-500 text-purple-500 hover:bg-purple-50'}
+                      onClick={() => updateOrderStatus('processing')}
+                    >
+                      Processing
+                    </Button>
+                    <Button 
+                      type="button"
+                      variant={currentOrder.status === 'shipped' ? 'default' : 'outline'}
+                      className={currentOrder.status === 'shipped' ? '' : 'border-blue-500 text-blue-500 hover:bg-blue-50'}
+                      onClick={() => updateOrderStatus('shipped')}
+                    >
+                      Shipped
+                    </Button>
+                    <Button 
+                      type="button"
+                      variant={currentOrder.status === 'delivered' ? 'default' : 'outline'}
+                      className={currentOrder.status === 'delivered' ? '' : 'border-green-500 text-green-500 hover:bg-green-50'}
+                      onClick={() => updateOrderStatus('delivered')}
+                    >
+                      Delivered
+                    </Button>
+                    <Button 
+                      type="button"
+                      variant={currentOrder.status === 'cancelled' ? 'default' : 'outline'}
+                      className={currentOrder.status === 'cancelled' ? '' : 'border-red-500 text-red-500 hover:bg-red-50'}
+                      onClick={() => updateOrderStatus('cancelled')}
+                      grid-column-span="2"
+                    >
+                      Cancelled
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOrderStatusDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default SellerDashboard;

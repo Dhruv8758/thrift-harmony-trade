@@ -3,8 +3,6 @@
  * Utility functions for real-time data synchronization across the application
  */
 
-import type { Product, Message, Order } from "@/types/product";
-
 // Use localStorage events for real-time communication between tabs/windows
 export const broadcastEvent = <T>(eventName: string, data: T): void => {
   // Store the event data in localStorage
@@ -199,5 +197,36 @@ export const toggleProductLike = (productId: string, userId: string) => {
   }
 };
 
-// Re-export types for convenience
-export type { Message, Order, Product };
+export type Message = {
+  id: string;
+  from: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
+  to: {
+    id: string;
+    name: string;
+  };
+  content: string;
+  timestamp: string;
+  read: boolean;
+  productId?: string;
+  productTitle?: string;
+};
+
+export type Order = {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  sellerId: string;
+  sellerName: string;
+  buyerId: string;
+  buyerName: string;
+  price: number;
+  date: string;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  deliveryAddress?: string;
+  contactNumber?: string;
+};

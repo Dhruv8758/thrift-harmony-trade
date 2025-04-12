@@ -14,7 +14,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { storeMessage, getCurrentUser } from "@/utils/realTimeUtils";
-import type { Message } from "@/types/product";
+import type { Message } from "@/utils/realTimeUtils";
 
 interface MessageDialogProps {
   recipientId: string;
