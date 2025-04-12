@@ -35,15 +35,11 @@ export type Order = {
   sellerName: string;
   buyerId: string;
   buyerName: string;
-  buyerEmail: string; // Added for contact info
-  buyerPhone: string; // Added for contact info
   price: number;
   date: string;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  deliveryAddress: string; // Made non-optional
-  contactNumber: string; // Made non-optional
-  paymentMethod: 'credit-card' | 'debit-card' | 'upi' | 'cash-on-delivery' | 'wallet';
-  paymentStatus: 'paid' | 'pending' | 'failed';
+  deliveryAddress?: string;
+  contactNumber?: string;
 };
 
 export type Message = {

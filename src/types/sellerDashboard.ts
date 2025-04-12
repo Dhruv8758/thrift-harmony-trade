@@ -16,17 +16,10 @@ export interface UIMessage {
 export interface UIOrder {
   id: string;
   product: string;
-  productImage: string; // Added
   customer: string;
-  customerEmail: string; // Added
-  customerPhone: string; // Added
   price: string;
   status: Order['status'];
   date: string;
-  deliveryAddress: string; // Added
-  contactNumber: string; // Added
-  paymentMethod: Order['paymentMethod']; // Added
-  paymentStatus: Order['paymentStatus']; // Added
 }
 
 export interface Payment {
@@ -57,21 +50,14 @@ export function convertToUIOrder(order: Order): UIOrder {
   return {
     id: order.id,
     product: order.productName,
-    productImage: order.productImage,
     customer: order.buyerName,
-    customerEmail: order.buyerEmail,
-    customerPhone: order.buyerPhone,
     price: `₹${order.price.toLocaleString()}`,
     status: order.status,
-    date: new Date(order.date).toLocaleDateString(),
-    deliveryAddress: order.deliveryAddress,
-    contactNumber: order.contactNumber,
-    paymentMethod: order.paymentMethod,
-    paymentStatus: order.paymentStatus
+    date: new Date(order.date).toLocaleDateString()
   };
 }
 
-// Function to convert a real order to a Payment
+// Function to convert a real order to a UIOrder
 export function createPaymentFromOrder(order: Order): Payment {
   return {
     id: `PAY-${order.id.split('_')[1]}`,
@@ -79,7 +65,6 @@ export function createPaymentFromOrder(order: Order): Payment {
     from: order.buyerName,
     for: order.productName,
     date: new Date(order.date).toLocaleDateString(),
-    status: order.paymentStatus === 'paid' ? 'completed' : 
-            order.paymentStatus === 'pending' ? 'pending' : 'failed'
+    status: 'completed' as const
   };
 }
